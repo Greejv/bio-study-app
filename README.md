@@ -5,12 +5,19 @@ Interaktívna učebná pomôcka o obehovej sústave a jej fylogenetickom vývoji
 Otvor `index.html` v prehliadači (funguje aj offline, len bez vlastných fontov).
 
 ## Čo obsahuje
-- **Mapa cesty** – 8 zastávok evolúcie. Každá: tip vopred → animovaná schéma → kľúčové body → „Prečo?“ → kontrolné otázky → veta na zapamätanie.
+- **Obsah** – 8 zastávok evolúcie. Každá prechádza overenými metódami učenia: rozcvička z minulej zastávky (opakovanie s odstupom) → tip vopred (predpoveď) → animovaná schéma (obraz + slovo) → vyfarbi schému sám (kreslenie) → kľúčové body s príkladmi → „Prečo?“ (elaborácia) → otázky z pamäti (vybavovanie) → doplňovačka → vysvetli spolužiakovi (učenie druhého) → rámček Zapamätaj si.
 - **Cesta kvapky** – hra: preveď kvapku krvi obehom ryby, žaby a človeka; farba ukazuje okysličenie.
 - **Kam patrí?** – triedenie živočíchov podľa typu obehovej sústavy (s výnimkami ako krokodíl či sépia).
-- **Kartičky** – opakovanie s rozostupmi (Leitnerov systém), postup sa ukladá v prehliadači.
-- **Skúška** – 12 zmiešaných otázok s vysvetlením chýb a odkazmi na zastávky na zopakovanie.
+- **Kartičky s otázkami** – opakovanie s rozostupmi (Leitnerov systém), postup sa ukladá v prehliadači.
+- **Písomka** – 12 zmiešaných otázok s vysvetlením chýb a odkazmi na zastávky na zopakovanie a známkou 1 – 5.
 - **Ťahák** – porovnávacia tabuľka a pomôcka „2 – 3 – 3½ – 4“.
 
 ## Vývoj
 Zdroj je `src/app.html`; `./build.sh` z neho vygeneruje `index.html`.
+
+## Dizajn
+Štvorčekový zošit z biológie (v tmavom režime školská tabuľa). Fonty: Anybody, Piazzolla, Shantell Sans.
+
+## Zdroje k metódam učenia
+- Dunlosky a kol. (2013), Improving Students' Learning With Effective Learning Techniques.
+- Weinstein, Madan, Sumeracki (2018), Teaching the science of learning.

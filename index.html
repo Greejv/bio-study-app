@@ -8,168 +8,189 @@
 <meta name="description" content="Interaktívna cesta vývojom obehovej sústavy živočíchov – od difúzie po štvordielne srdce.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anybody:wdth,wght@50..150,500..900&family=Piazzolla:ital,opsz,wght@0,8..30,400..700;1,8..30,400&family=Shantell+Sans:wght@400..700&display=swap">
 <style>
-/* Layout: jeden úzky stĺpec ako učebnica vo vrecku; mapa = časová os, stanica = krokovaný výklad so schémou zapojenia ako elektrický obvod. */
+/* Layout: strana zo štvorčekového zošita z biológie. Vľavo okraj za červenou linkou na poznámky (roky, čísla strán, opravy),
+   vpravo text ako v učebnici. Svetlý režim = zošit, tmavý režim = školská tabuľa. */
 :root {
-  --paper: #F3F5F6;
-  --surface: #FFFFFF;
-  --ink: #14202A;
-  --muted: #5A6872;
-  --line: #D9E0E4;
-  --oxy: #C61F3A;     /* okysličená krv */
-  --deoxy: #2A57C4;   /* odkysličená krv */
-  --mix: #7C47AE;     /* zmiešaná krv */
-  --hemo: #A87D12;    /* hemolymfa */
-  --pale: #8B979F;    /* bezfarebná krv */
-  --ok: #1D8457;
-  --bad: #C2410C;
-  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
-  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
-  --f-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
-  --r: 10px;
+  --paper: #FCFCFA;
+  --grid: #DCE7F1;
+  --margin: #E26A6A;
+  --ink: #1C1C1F;
+  --muted: #5F646C;
+  --pen: #1E3A8A;      /* plniace pero */
+  --red: #C62828;      /* červené pero učiteľa */
+  --green: #2E7D32;
+  --hl: #FFE55C;       /* zvýrazňovač */
+  --sheet: #FFFFFF;
+  --oxy: #C8102E;
+  --deoxy: #2F5CC7;
+  --mix: #7B3FA8;
+  --hemo: #A3780E;
+  --pale: #8A939C;
+  --f-head: "Anybody", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+  --f-body: "Piazzolla", Georgia, "Times New Roman", serif;
+  --f-hand: "Shantell Sans", "Segoe Print", "Bradley Hand", cursive;
+  --cell: 24px;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --paper: #0E151B; --surface: #151F27; --ink: #E5ECEF; --muted: #93A2AC; --line: #26333D;
-    --oxy: #FF5C70; --deoxy: #6F97FF; --mix: #B98CE8; --hemo: #E2B64B; --pale: #8D9BA5;
-    --ok: #4CC58C; --bad: #F2904F; color-scheme: dark;
+    --paper: #1F2B26; --grid: #28362F; --margin: #9C4C4A; --ink: #ECECE4; --muted: #A9B4AD;
+    --pen: #A8C6F2; --red: #FF8F85; --green: #A3D9A0; --hl: #6E6526; --sheet: #25332D;
+    --oxy: #FF6B7A; --deoxy: #82A8FF; --mix: #C79DEB; --hemo: #E6C262; --pale: #9AA59F; color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --paper: #0E151B; --surface: #151F27; --ink: #E5ECEF; --muted: #93A2AC; --line: #26333D;
-  --oxy: #FF5C70; --deoxy: #6F97FF; --mix: #B98CE8; --hemo: #E2B64B; --pale: #8D9BA5;
-  --ok: #4CC58C; --bad: #F2904F; color-scheme: dark;
+  --paper: #1F2B26; --grid: #28362F; --margin: #9C4C4A; --ink: #ECECE4; --muted: #A9B4AD;
+  --pen: #A8C6F2; --red: #FF8F85; --green: #A3D9A0; --hl: #6E6526; --sheet: #25332D;
+  --oxy: #FF6B7A; --deoxy: #82A8FF; --mix: #C79DEB; --hemo: #E6C262; --pale: #9AA59F; color-scheme: dark;
 }
 
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
 body {
-  background: var(--paper); color: var(--ink);
-  font-family: var(--f-body); font-size: 17px; line-height: 1.55;
+  background-color: var(--paper); color: var(--ink);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: var(--cell) var(--cell);
+  font-family: var(--f-body); font-size: 18px; line-height: 1.55;
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
 }
-.wrap { max-width: 720px; margin: 0 auto; padding-block: 20px 48px; }
-h1, h2, h3 { font-family: var(--f-display); line-height: 1.12; margin: 0; text-wrap: balance; letter-spacing: -0.01em; }
-h1 { font-size: clamp(2.2rem, 7vw, 3.4rem); font-weight: 800; }
-h2 { font-size: clamp(1.6rem, 5vw, 2.1rem); font-weight: 700; }
-h3 { font-size: 1.15rem; font-weight: 700; }
+.wrap { max-width: 760px; margin: 0 auto; padding-block: 18px 40px; position: relative; padding-left: 76px; }
+.wrap::before { content: ""; position: absolute; top: 0; bottom: 0; left: 60px; width: 2px; background: var(--margin); opacity: .7; }
+@media (max-width: 560px) {
+  .wrap { padding-left: 40px; }
+  .wrap::before { left: 28px; }
+}
+h1, h2, h3 { font-family: var(--f-head); font-stretch: 70%; margin: 0; line-height: 1.05; text-wrap: balance; }
+h1 { font-size: clamp(2.6rem, 9vw, 4.4rem); font-weight: 900; letter-spacing: -0.01em; }
+h2 { font-size: clamp(1.6rem, 5.4vw, 2.2rem); font-weight: 800; text-decoration: underline; text-decoration-color: var(--red); text-decoration-thickness: 3px; text-underline-offset: 7px; text-decoration-skip-ink: none; }
+h3 { font-size: 1.25rem; font-weight: 800; }
 p { margin: 0; }
-b, strong { font-weight: 700; }
 a { color: inherit; }
-.mono, .eyebrow { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+b, strong { font-weight: 700; }
+.points b, .hl { background: linear-gradient(100deg, transparent 2%, var(--hl) 4%, var(--hl) 96%, transparent 98%) 0 62% / 100% 58% no-repeat; padding: 0 2px; }
+.hand { font-family: var(--f-hand); color: var(--pen); line-height: 1.25; }
+.small { font-size: .9rem; }
 .muted { color: var(--muted); }
-.stack { display: flex; flex-direction: column; gap: 16px; }
+.stack { display: flex; flex-direction: column; gap: 18px; }
 .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-:focus-visible { outline: 3px solid var(--deoxy); outline-offset: 2px; border-radius: 6px; }
+:focus-visible { outline: 3px solid var(--pen); outline-offset: 3px; }
+.marg { position: absolute; left: -76px; width: 56px; text-align: right; font-family: var(--f-hand); color: var(--muted); font-size: .9rem; line-height: 1.2; }
+@media (max-width: 560px) { .marg { left: -40px; width: 22px; font-size: .78rem; } }
 
-/* Top bar */
-.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-bottom: 20px; }
-.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; font-family: var(--f-display); font-weight: 700; font-size: 1.05rem; }
-.brand svg { width: 26px; height: 26px; }
-.toplinks { display: flex; gap: 6px; }
-.toplink { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: .05em; text-transform: uppercase; text-decoration: none; padding: 7px 10px; border-radius: 8px; color: var(--muted); }
-.toplink:hover { background: var(--surface); color: var(--ink); }
+/* hlavička strany */
+.top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding-bottom: 22px; border-bottom: 1.5px solid var(--ink); margin-bottom: 26px; }
+.brand { font-family: var(--f-head); font-stretch: 70%; font-weight: 800; font-size: 1.1rem; text-decoration: none; letter-spacing: .01em; }
+.brand span { color: var(--oxy); }
+.toplinks { display: flex; gap: 16px; font-size: .95rem; }
+.toplinks a { text-decoration: none; border-bottom: 1px solid currentColor; }
+.toplinks a:hover { background: var(--hl); }
 
-/* Buttons */
+/* tlačidlá: hranaté, bez tieňov */
 button { font: inherit; color: inherit; }
-.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 20px; border-radius: 999px; border: 1.5px solid var(--ink); background: var(--ink); color: var(--paper); font-weight: 700; cursor: pointer; text-decoration: none; transition: transform .12s ease; }
-.btn:active { transform: scale(.98); }
-.btn.ghost { background: transparent; color: var(--ink); border-color: var(--line); }
-.btn.ghost:hover { border-color: var(--ink); }
-.btn[disabled] { opacity: .35; cursor: not-allowed; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 50px; padding: 0 22px; border: 2px solid var(--ink); background: var(--ink); color: var(--paper); font-family: var(--f-head); font-stretch: 82%; font-weight: 800; font-size: 1.05rem; cursor: pointer; text-decoration: none; border-radius: 0; }
+.btn:hover { background: var(--pen); border-color: var(--pen); }
+.btn.ghost { background: var(--paper); color: var(--ink); }
+.btn.ghost:hover { background: var(--hl); border-color: var(--ink); }
+.btn[disabled] { opacity: .3; cursor: not-allowed; }
 .btn.wide { width: 100%; }
 
-/* Home */
-.hero { display: grid; gap: 18px; padding-block: 8px 28px; }
-.hero h1 .beat { color: var(--oxy); }
-.lede { font-size: 1.1rem; color: var(--muted); max-width: 34em; }
-.progress-line { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
-.pips { display: flex; gap: 5px; }
-.pip { width: 22px; height: 6px; border-radius: 3px; background: var(--line); }
-.pip.on { background: var(--oxy); }
+/* domov */
+.intro { display: grid; gap: 16px; padding-bottom: 12px; }
+.subject { font-size: 1.15rem; }
+.intro h1 .beat { color: var(--oxy); }
+.lede { font-size: 1.12rem; max-width: 33em; }
+.state { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+.tally { font-family: var(--f-hand); color: var(--pen); font-size: 1.1rem; }
+.sec { margin: 44px 0 16px; position: relative; }
+.toc { list-style: none; margin: 0; padding: 0; }
+.toc li { position: relative; border-bottom: 1px solid var(--grid); }
+.toc a { display: flex; align-items: baseline; gap: 8px; padding: 12px 0; text-decoration: none; min-width: 0; }
+.toc a:hover .t strong { background: var(--hl); }
+.toc .num { font-family: var(--f-head); font-stretch: 70%; font-weight: 800; min-width: 1.4em; }
+.toc .t { min-width: 0; flex: 0 1 auto; }
+.toc .t strong { font-family: var(--f-head); font-stretch: 82%; font-weight: 700; font-size: 1.12rem; }
+.toc .t small { display: block; font-size: .9rem; color: var(--muted); }
+.toc .dots { flex: 1 1 20px; border-bottom: 2px dotted var(--muted); opacity: .5; transform: translateY(-6px); min-width: 16px; }
+.toc .kind { font-style: italic; font-size: .95rem; white-space: nowrap; }
+.toc .marg { top: 14px; }
+.toc .tick { position: absolute; right: -4px; top: -2px; font-family: var(--f-hand); color: var(--red); font-size: 1.6rem; transform: rotate(-8deg); pointer-events: none; }
+.toc li.done .kind { padding-right: 22px; }
+.toc li.next .t strong { background: var(--hl); }
+@media (max-width: 560px) { .toc .dots, .toc .kind { display: none; } }
+.pen-note { font-family: var(--f-hand); color: var(--pen); font-size: 1.05rem; line-height: 1.35; max-width: 32em; transform: rotate(-.6deg); margin-top: 16px; }
+.pen-note b { color: var(--red); font-weight: 700; }
+.tasks { list-style: none; margin: 0; padding: 0; counter-reset: u; }
+.tasks li { counter-increment: u; border-bottom: 1px solid var(--grid); }
+.tasks a { display: grid; grid-template-columns: auto 1fr auto; gap: 4px 14px; padding: 14px 0; text-decoration: none; align-items: baseline; }
+.tasks a::before { content: "Úloha " counter(u); font-family: var(--f-head); font-stretch: 70%; font-weight: 800; color: var(--red); white-space: nowrap; }
+.tasks a:hover strong { background: var(--hl); }
+.tasks strong { font-family: var(--f-head); font-stretch: 82%; font-size: 1.12rem; }
+.tasks span { grid-column: 2; font-size: .95rem; color: var(--muted); }
+.tasks em { grid-column: 3; grid-row: 1; font-family: var(--f-hand); font-style: normal; color: var(--pen); white-space: nowrap; }
+@media (max-width: 560px) { .tasks a { grid-template-columns: 1fr; } .tasks span, .tasks em { grid-column: 1; grid-row: auto; } }
 
-.section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 36px 0 14px; }
-.note { font-size: 0.92rem; color: var(--muted); border-left: 2px solid var(--line); padding-left: 12px; max-width: 40em; }
-
-.timeline { list-style: none; margin: 0; padding: 0; position: relative; }
-.timeline::before { content: ""; position: absolute; left: 92px; top: 18px; bottom: 18px; width: 2px; background: var(--line); }
-.stop a { display: grid; grid-template-columns: 76px 34px 1fr auto; align-items: center; gap: 0 10px; padding: 12px 10px 12px 0; text-decoration: none; border-radius: var(--r); }
-.stop a:hover { background: var(--surface); }
-.stop .era { font-family: var(--f-mono); font-size: 0.72rem; color: var(--muted); text-align: right; line-height: 1.3; }
-.stop .node { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--line); background: var(--paper); justify-self: center; position: relative; z-index: 1; }
-.stop.done .node { background: var(--oxy); border-color: var(--oxy); }
-.stop.next .node { border-color: var(--oxy); box-shadow: 0 0 0 5px color-mix(in srgb, var(--oxy) 18%, transparent); }
-.stop .name { min-width: 0; }
-.stop .name strong { display: block; font-family: var(--f-display); font-size: 1.08rem; }
-.stop .name span { font-size: 0.9rem; color: var(--muted); }
-.chip { font-family: var(--f-mono); font-size: 0.7rem; letter-spacing: .03em; padding: 4px 8px; border-radius: 6px; border: 1px solid var(--line); white-space: nowrap; color: var(--muted); }
-
-.modes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-.mode { display: flex; flex-direction: column; gap: 6px; padding: 18px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); text-decoration: none; min-width: 0; }
-.mode:hover { border-color: var(--ink); }
-.mode h3 { display: flex; justify-content: space-between; gap: 8px; }
-.mode p { font-size: 0.92rem; color: var(--muted); }
-.mode .meta { margin-top: auto; padding-top: 8px; }
-@media (max-width: 520px) {
-  .modes { grid-template-columns: 1fr; }
-  .stop a { grid-template-columns: 58px 26px 1fr; }
-  .stop .chip { grid-column: 3; justify-self: start; margin-top: 4px; }
-  .timeline::before { left: 70px; }
-}
-
-/* Station */
-.bar { display: flex; gap: 4px; margin: 4px 0 22px; }
-.bar i { flex: 1; height: 4px; border-radius: 2px; background: var(--line); }
-.bar i.on { background: var(--ink); }
-.card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: clamp(18px, 4vw, 28px); display: flex; flex-direction: column; gap: 18px; }
-.card .lead { font-size: 1.08rem; }
-.predict { border-top: 1px dashed var(--line); padding-top: 18px; display: flex; flex-direction: column; gap: 12px; }
-.opts { display: flex; flex-direction: column; gap: 10px; }
-.opt { text-align: left; display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; border-radius: var(--r); border: 1.5px solid var(--line); background: var(--paper); cursor: pointer; line-height: 1.4; }
-.opt:hover:not([disabled]) { border-color: var(--ink); }
-.opt .k { font-family: var(--f-mono); font-size: .75rem; color: var(--muted); padding-top: 3px; min-width: 1em; }
+/* stanica */
+.pagehead { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 18px; }
+.pagehead a { font-size: .95rem; }
+.pageno { font-family: var(--f-hand); color: var(--muted); }
+.kicker { font-style: italic; color: var(--muted); }
+.lead { font-size: 1.15rem; }
+.q { font-family: var(--f-head); font-stretch: 82%; font-weight: 800; font-size: 1.3rem; line-height: 1.2; }
+.opts { display: flex; flex-direction: column; border-top: 1px solid var(--grid); }
+.opt { position: relative; text-align: left; display: grid; grid-template-columns: 34px 1fr; align-items: baseline; padding: 13px 8px 13px 0; border: 0; border-bottom: 1px solid var(--grid); background: transparent; cursor: pointer; line-height: 1.4; }
+.opt:hover:not([disabled]) { background: color-mix(in srgb, var(--hl) 45%, transparent); }
+.opt .k { font-family: var(--f-head); font-stretch: 82%; font-weight: 800; position: relative; justify-self: center; }
+.opt .ring { position: absolute; left: -9px; top: -7px; width: 34px; height: 34px; overflow: visible; pointer-events: none; }
+.opt .ring path { fill: none; stroke: var(--pen); stroke-width: 2.2; stroke-linecap: round; stroke-dasharray: 120; stroke-dashoffset: 120; animation: draw .45s ease-out forwards; }
 .opt[disabled] { cursor: default; }
-.opt.right { border-color: var(--ok); background: color-mix(in srgb, var(--ok) 10%, var(--surface)); }
-.opt.wrong { border-color: var(--bad); background: color-mix(in srgb, var(--bad) 8%, var(--surface)); }
-.opt.dim { opacity: .55; }
-.feedback { padding: 14px 16px; border-radius: var(--r); background: var(--paper); font-size: .97rem; }
-.feedback strong { display: block; font-family: var(--f-display); margin-bottom: 2px; }
-.feedback.good strong { color: var(--ok); }
-.feedback.miss strong { color: var(--bad); }
-.points { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 14px; }
-.points li { display: grid; grid-template-columns: 22px 1fr; gap: 8px; }
-.points li::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--oxy); margin-top: 9px; }
+.opt.wrong .txt { text-decoration: line-through; text-decoration-color: var(--red); text-decoration-thickness: 2px; }
+.opt.dim { color: var(--muted); }
+.opt .mark { position: absolute; left: -46px; top: 4px; font-family: var(--f-hand); font-size: 1.7rem; color: var(--red); line-height: 1; transform: rotate(-10deg); }
+@media (max-width: 560px) { .opt .mark { left: -36px; font-size: 1.4rem; } }
+@keyframes draw { to { stroke-dashoffset: 0; } }
+.feedback { font-size: 1rem; }
+.feedback .verdict { display: block; font-family: var(--f-hand); font-size: 1.35rem; color: var(--red); line-height: 1.2; margin-bottom: 2px; }
+.feedback.good .verdict { color: var(--green); }
+.points { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 14px; counter-reset: p; }
+.points li { counter-increment: p; display: grid; grid-template-columns: 26px 1fr; }
+.points li::before { content: counter(p) "."; font-family: var(--f-head); font-stretch: 70%; font-weight: 800; color: var(--red); }
+figure { margin: 0; background: var(--sheet); border: 1.5px solid var(--ink); padding: 14px 14px 12px; }
+figcaption { font-size: .95rem; margin-top: 10px; }
+figcaption b { font-family: var(--f-head); font-stretch: 82%; }
 .diagram { width: 100%; overflow-x: auto; }
 .diagram svg { display: block; width: 100%; max-width: 560px; height: auto; margin: 0 auto; }
-.legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: .85rem; color: var(--muted); }
+.legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: .9rem; margin-top: 8px; }
 .legend span { display: inline-flex; align-items: center; gap: 6px; }
-.legend i { width: 18px; height: 4px; border-radius: 2px; display: inline-block; }
-.hidden-answer { border: 1.5px dashed var(--line); border-radius: var(--r); padding: 16px; }
-.remember { font-family: var(--f-display); font-size: clamp(1.4rem, 4.5vw, 1.9rem); font-weight: 700; line-height: 1.2; }
-.navbar { position: sticky; bottom: 0; display: flex; gap: 10px; justify-content: space-between; padding: 14px 0 calc(14px + env(safe-area-inset-bottom, 0px)); background: linear-gradient(to top, var(--paper) 70%, transparent); margin-top: 18px; }
-.navbar .btn { flex: 1; max-width: 220px; }
+.legend i { width: 22px; height: 4px; display: inline-block; }
+.think { border: 2px dashed var(--pen); padding: 16px; display: flex; flex-direction: column; gap: 12px; align-items: flex-start; }
+.remember-box { border: 2.5px solid var(--ink); background: var(--sheet); padding: 18px 20px 20px; position: relative; margin-top: 10px; }
+.remember-box .tag { position: absolute; top: -14px; left: 14px; background: var(--paper); padding: 0 8px; font-family: var(--f-head); font-stretch: 70%; font-weight: 900; text-transform: uppercase; font-size: .9rem; letter-spacing: .04em; }
+.remember { font-family: var(--f-hand); color: var(--pen); font-size: clamp(1.5rem, 5vw, 2rem); line-height: 1.25; }
+.navbar { position: sticky; bottom: 0; display: flex; gap: 10px; justify-content: space-between; padding: 14px 0 calc(14px + env(safe-area-inset-bottom, 0px)); background: var(--paper); border-top: 1.5px solid var(--ink); margin-top: 26px; }
+.navbar .btn { flex: 1; max-width: 230px; }
 .navbar .btn:last-child { margin-left: auto; }
-.kbd { font-family: var(--f-mono); font-size: .7rem; color: var(--muted); text-align: center; margin-top: 6px; }
+.kbd { font-size: .8rem; color: var(--muted); text-align: right; margin-top: 4px; font-style: italic; }
 @media (hover: none) { .kbd { display: none; } }
 
-/* SVG schemes */
-.sv text { font-family: var(--f-body); fill: var(--ink); font-size: 12px; }
-.sv .lbl { font-family: var(--f-mono); font-size: 9.5px; fill: var(--muted); letter-spacing: .02em; }
-.sv .ttl { font-weight: 700; font-size: 12.5px; }
-.sv .organ { fill: var(--paper); stroke: var(--ink); stroke-width: 1.5; }
+/* schémy (SVG) */
+.sv text { font-family: var(--f-body); fill: var(--ink); font-size: 12.5px; }
+.sv .lbl { font-family: var(--f-hand); font-size: 12px; fill: var(--pen); }
+.sv .ttl { font-family: var(--f-head); font-stretch: 82%; font-weight: 700; font-size: 13px; }
+.sv .rough { filter: url(#rough); }
+.sv .organ { fill: var(--sheet); stroke: var(--ink); stroke-width: 1.6; }
 .sv .wall { fill: none; stroke: var(--ink); stroke-width: 1.5; }
-.sv .faint { fill: color-mix(in srgb, var(--ink) 4%, var(--surface)); stroke: var(--line); stroke-width: 1.5; }
+.sv .faint { fill: color-mix(in srgb, var(--ink) 5%, var(--sheet)); stroke: var(--ink); stroke-width: 1.4; }
 .sv .sept { stroke: var(--ink); stroke-width: 3; stroke-linecap: round; }
-.sv .ch-oxy { fill: color-mix(in srgb, var(--oxy) 16%, var(--surface)); stroke: var(--oxy); stroke-width: 1.5; }
-.sv .ch-deoxy { fill: color-mix(in srgb, var(--deoxy) 16%, var(--surface)); stroke: var(--deoxy); stroke-width: 1.5; }
-.sv .ch-mix { fill: color-mix(in srgb, var(--mix) 18%, var(--surface)); stroke: var(--mix); stroke-width: 1.5; }
-.sv .ch-mixb { fill: color-mix(in srgb, color-mix(in srgb, var(--deoxy) 65%, var(--mix)) 18%, var(--surface)); stroke: color-mix(in srgb, var(--deoxy) 65%, var(--mix)); stroke-width: 1.5; }
-.sv .ch-mixr { fill: color-mix(in srgb, color-mix(in srgb, var(--oxy) 65%, var(--mix)) 18%, var(--surface)); stroke: color-mix(in srgb, var(--oxy) 65%, var(--mix)); stroke-width: 1.5; }
-.sv .ch-hemo { fill: color-mix(in srgb, var(--hemo) 22%, var(--surface)); stroke: var(--hemo); stroke-width: 1.5; }
-.sv .track { fill: none; stroke-width: 4; stroke-linejoin: round; opacity: .28; }
-.sv .flow { fill: none; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1 11; animation: flow 1.1s linear infinite; }
+.sv .ch-oxy { fill: color-mix(in srgb, var(--oxy) 18%, var(--sheet)); stroke: var(--oxy); stroke-width: 1.6; }
+.sv .ch-deoxy { fill: color-mix(in srgb, var(--deoxy) 18%, var(--sheet)); stroke: var(--deoxy); stroke-width: 1.6; }
+.sv .ch-mix { fill: color-mix(in srgb, var(--mix) 20%, var(--sheet)); stroke: var(--mix); stroke-width: 1.6; }
+.sv .ch-mixb { fill: color-mix(in srgb, color-mix(in srgb, var(--deoxy) 65%, var(--mix)) 20%, var(--sheet)); stroke: color-mix(in srgb, var(--deoxy) 65%, var(--mix)); stroke-width: 1.6; }
+.sv .ch-mixr { fill: color-mix(in srgb, color-mix(in srgb, var(--oxy) 65%, var(--mix)) 20%, var(--sheet)); stroke: color-mix(in srgb, var(--oxy) 65%, var(--mix)); stroke-width: 1.6; }
+.sv .ch-hemo { fill: color-mix(in srgb, var(--hemo) 24%, var(--sheet)); stroke: var(--hemo); stroke-width: 1.6; }
+.sv .track { fill: none; stroke-width: 4.5; stroke-linejoin: round; opacity: .3; }
+.sv .flow { fill: none; stroke-width: 4.5; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1 11; animation: flow 1.1s linear infinite; }
 .sv .s-oxy { stroke: var(--oxy); } .sv .f-oxy { fill: var(--oxy); }
 .sv .s-deoxy { stroke: var(--deoxy); } .sv .f-deoxy { fill: var(--deoxy); }
 .sv .s-mix { stroke: var(--mix); } .sv .f-mix { fill: var(--mix); }
@@ -177,78 +198,112 @@ button { font: inherit; color: inherit; }
 .sv .s-mixr { stroke: color-mix(in srgb, var(--oxy) 65%, var(--mix)); } .sv .f-mixr { fill: color-mix(in srgb, var(--oxy) 65%, var(--mix)); }
 .sv .s-hemo { stroke: var(--hemo); } .sv .f-hemo { fill: var(--hemo); }
 .sv .s-pale { stroke: var(--pale); } .sv .f-pale { fill: var(--pale); }
-.sv .s-ink { stroke: var(--muted); } .sv .f-ink { fill: var(--muted); }
+.sv .s-ink { stroke: var(--pen); } .sv .f-ink { fill: var(--pen); }
 .sv .pulse { animation: pulse 1.1s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
 .sv .dot { animation: drift 2.6s ease-out infinite; }
 @keyframes flow { to { stroke-dashoffset: -24; } }
 @keyframes pulse { 50% { transform: scale(1.12); } }
 @keyframes drift { 0% { transform: translate(0,0); opacity: 0; } 15% { opacity: 1; } 100% { transform: translate(var(--dx), var(--dy)); opacity: 0; } }
 
-/* Games */
-.tabs { display: flex; gap: 6px; flex-wrap: wrap; }
-.tab { padding: 8px 14px; border-radius: 999px; border: 1.5px solid var(--line); background: transparent; cursor: pointer; font-weight: 700; }
-.tab.on { background: var(--ink); color: var(--paper); border-color: var(--ink); }
-.path { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0; counter-reset: s; }
-.path li { display: grid; grid-template-columns: 28px 14px 1fr; align-items: center; gap: 10px; padding: 6px 0; position: relative; }
-.path li .n { font-family: var(--f-mono); font-size: .72rem; color: var(--muted); text-align: right; }
-.path li .d { width: 12px; height: 12px; border-radius: 50%; }
-.path li.slot .d { border: 2px dashed var(--line); }
-.path li.slot span:last-child { color: var(--muted); }
+/* hry */
+.choice { display: flex; gap: 18px; flex-wrap: wrap; font-family: var(--f-head); font-stretch: 82%; font-weight: 700; font-size: 1.1rem; }
+.choice button { background: none; border: 0; padding: 4px 0; cursor: pointer; color: var(--muted); }
+.choice button.on { color: var(--ink); text-decoration: underline; text-decoration-color: var(--red); text-decoration-thickness: 3px; text-underline-offset: 6px; }
+.path { list-style: none; margin: 0; padding: 0; }
+.path li { display: grid; grid-template-columns: 30px 16px 1fr; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--grid); }
+.path li .n { font-family: var(--f-head); font-stretch: 70%; font-weight: 800; text-align: right; }
+.path li .d { width: 13px; height: 13px; border-radius: 50%; }
+.path li.slot .d { border: 2px dashed var(--muted); }
+.path li.slot .txt { font-family: var(--f-hand); color: var(--muted); }
 .pool { display: flex; flex-wrap: wrap; gap: 8px; }
-.tile { padding: 10px 14px; border-radius: 10px; border: 1.5px solid var(--line); background: var(--surface); cursor: pointer; font-weight: 700; }
-.tile:hover { border-color: var(--ink); }
-.tile.shake { animation: shake .35s; border-color: var(--bad); }
+.tile { padding: 9px 13px; border: 1.5px solid var(--ink); background: var(--sheet); cursor: pointer; font-family: var(--f-head); font-stretch: 82%; font-weight: 700; font-size: 1rem; }
+.tile:hover { background: var(--hl); }
+.tile.shake { animation: shake .35s; border-color: var(--red); }
 @keyframes shake { 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
-.hint { font-size: .95rem; padding: 12px 14px; border-radius: var(--r); background: color-mix(in srgb, var(--bad) 8%, var(--surface)); }
+.hint { font-family: var(--f-hand); color: var(--red); font-size: 1.1rem; line-height: 1.35; }
+.hint b { font-weight: 700; }
+.animal { font-family: var(--f-head); font-stretch: 65%; font-size: clamp(2.4rem, 10vw, 3.6rem); font-weight: 900; line-height: 1; }
+.cats { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); column-gap: 18px; border-top: 1px solid var(--grid); }
+.cats .opts { border: 0; }
+@media (max-width: 520px) { .cats { grid-template-columns: 1fr; } }
 
-.animal { font-family: var(--f-display); font-size: clamp(2rem, 8vw, 2.8rem); font-weight: 800; }
-.cats { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px; }
-.cats .opt { min-width: 0; }
-@media (max-width: 480px) { .cats { grid-template-columns: 1fr; } }
+/* kartotečný lístok */
+.flash { position: relative; display: flex; flex-direction: column; gap: 14px; justify-content: center; min-height: 270px; padding: 46px 22px 26px; text-align: left; cursor: pointer; border: 1.5px solid var(--ink); background-color: var(--sheet); background-image: linear-gradient(var(--margin), var(--margin)), repeating-linear-gradient(transparent 0 31px, var(--grid) 31px 32px); background-size: 100% 2px, 100% 100%; background-position: 0 36px, 0 6px; background-repeat: no-repeat, repeat; width: 100%; user-select: none; }
+.flash .side { position: absolute; top: 8px; left: 14px; font-family: var(--f-hand); color: var(--muted); font-size: .95rem; }
+.flash .fq { font-family: var(--f-head); font-stretch: 82%; font-size: clamp(1.35rem, 4.6vw, 1.75rem); font-weight: 800; line-height: 1.22; }
+.flash .fa { font-family: var(--f-hand); color: var(--pen); font-size: 1.3rem; line-height: 1.35; }
+.boxes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; border: 1.5px solid var(--ink); }
+.boxes div { padding: 8px 10px; border-right: 1px solid var(--ink); font-size: .85rem; }
+.boxes div:last-child { border-right: 0; background: color-mix(in srgb, var(--green) 14%, transparent); }
+.boxes b { display: block; font-family: var(--f-head); font-stretch: 70%; font-size: 1.5rem; line-height: 1.1; font-variant-numeric: tabular-nums; }
 
-.flash { min-height: 260px; cursor: pointer; justify-content: center; text-align: center; align-items: center; user-select: none; }
-.flash .q { font-family: var(--f-display); font-size: clamp(1.3rem, 4.5vw, 1.7rem); font-weight: 700; line-height: 1.25; max-width: 22em; }
-.flash .a { font-size: 1.08rem; max-width: 30em; }
-.boxes { display: flex; gap: 6px; align-items: flex-end; height: 44px; }
-.boxes div { flex: 1; background: var(--line); border-radius: 4px 4px 0 0; position: relative; min-height: 3px; }
-.boxes div.lit { background: var(--ok); }
-.boxlbl { display: flex; gap: 6px; } .boxlbl span { flex: 1; text-align: center; font-family: var(--f-mono); font-size: .66rem; color: var(--muted); }
+/* známka */
+.grade { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; }
+.grade .mk { position: relative; width: 104px; height: 104px; display: grid; place-items: center; font-family: var(--f-hand); color: var(--red); font-size: 4.2rem; line-height: 1; transform: rotate(-6deg); }
+.grade .mk svg { position: absolute; inset: 0; overflow: visible; }
+.grade .mk path { fill: none; stroke: var(--red); stroke-width: 3; stroke-linecap: round; stroke-dasharray: 340; stroke-dashoffset: 340; animation: draw .7s .15s ease-out forwards; }
+.grade .pts { font-family: var(--f-hand); color: var(--red); font-size: 1.5rem; }
+.miss-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; }
+.miss-list li { padding: 12px 0; border-bottom: 1px solid var(--grid); font-size: .98rem; }
+.miss-list .fix { font-family: var(--f-hand); color: var(--red); font-size: 1.1rem; }
 
-.score { font-family: var(--f-display); font-size: clamp(3rem, 12vw, 4.5rem); font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
-.miss-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; }
-.miss-list li { padding: 14px 16px; border-radius: var(--r); background: var(--paper); font-size: .95rem; }
-
-/* Cheat sheet */
-.tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); }
-table { border-collapse: collapse; width: 100%; min-width: 640px; font-size: .9rem; }
-th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
-th { font-family: var(--f-mono); font-size: .7rem; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
-tr:last-child td { border-bottom: 0; }
+/* ťahák */
+.tablewrap { overflow-x: auto; border: 1.5px solid var(--ink); background: var(--sheet); }
+table { border-collapse: collapse; width: 100%; min-width: 660px; font-size: .92rem; }
+th, td { text-align: left; padding: 9px 11px; border: 1px solid color-mix(in srgb, var(--ink) 30%, transparent); vertical-align: top; }
+th { font-family: var(--f-head); font-stretch: 75%; font-weight: 800; background: color-mix(in srgb, var(--ink) 6%, var(--sheet)); }
 td:first-child { font-weight: 700; }
-.mnemo { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 8px; }
-.mnemo div { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 14px 10px; text-align: center; }
-.mnemo b { display: block; font-family: var(--f-display); font-size: 2rem; line-height: 1; }
-.mnemo span { font-size: .85rem; color: var(--muted); }
-@media (max-width: 480px) { .mnemo { grid-template-columns: repeat(2, minmax(0,1fr)); } }
-.rule { padding: 18px; border-radius: var(--r); background: var(--surface); border: 1px solid var(--line); }
+.mnemo { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 22px; }
+.mnemo div { display: flex; align-items: baseline; gap: 8px; }
+.mnemo b { font-family: var(--f-hand); color: var(--red); font-size: 2.6rem; line-height: 1; }
+.mnemo span { font-size: .95rem; }
+.rule { border-left: 3px solid var(--red); padding: 2px 0 2px 16px; display: flex; flex-direction: column; gap: 6px; }
+.tabcap { font-size: .95rem; }
+.tabcap b { font-family: var(--f-head); font-stretch: 82%; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
   .sv .flow { stroke-dasharray: none; }
+  .opt .ring path, .grade .mk path { stroke-dashoffset: 0; }
 }
+/* nové kroky učenia */
+.method { font-family: var(--f-hand); color: var(--pen); font-size: .95rem; line-height: 1.3; }
+.method b { color: var(--red); font-weight: 700; }
+.palette { display: flex; gap: 8px; flex-wrap: wrap; }
+.palette button { display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1.5px solid var(--line, var(--ink)); background: var(--sheet); cursor: pointer; font-weight: 600; }
+.palette button i { width: 18px; height: 18px; border-radius: 50%; display: inline-block; }
+.palette button.on { outline: 3px solid var(--ink); outline-offset: 1px; }
+.sv .s-blank { stroke: var(--muted); } .sv .f-blank { fill: var(--muted); }
+.sv .hit { fill: none; stroke: transparent; stroke-width: 22; cursor: pointer; pointer-events: stroke; }
+.sv .paint { cursor: pointer; }
+.sv .bad { stroke: var(--red) !important; stroke-dasharray: 4 3; stroke-width: 2.5 !important; }
+.cloze { font-size: 1.2rem; line-height: 2.3; }
+.gap { display: inline-block; min-width: 5.5em; border: 0; border-bottom: 2px solid var(--ink); background: transparent; padding: 0 6px; margin: 0 2px; font-family: var(--f-hand); color: var(--pen); font-size: 1.1rem; line-height: 1.5; cursor: pointer; text-align: center; }
+.gap.empty { color: var(--muted); }
+.gap.ok { border-color: var(--green); color: var(--green); }
+.gap.no { border-color: var(--red); color: var(--red); text-decoration: line-through; }
+.cloze .fix { font-family: var(--f-hand); color: var(--red); font-size: 1.1rem; margin-right: 4px; }
+.bank { display: flex; gap: 8px; flex-wrap: wrap; }
+.bank .tile[disabled] { opacity: .25; cursor: default; }
+textarea { width: 100%; min-height: 150px; resize: vertical; font-family: var(--f-hand); color: var(--pen); font-size: 1.1rem; line-height: 32px; padding: 4px 10px; border: 1.5px solid var(--ink); background-color: var(--sheet); background-image: repeating-linear-gradient(transparent 0 31px, var(--grid) 31px 32px); background-position: 0 4px; }
+.checklist { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 6px; }
+.checklist li { display: grid; grid-template-columns: 26px 1fr; font-size: 1rem; }
+.checklist li .m { font-family: var(--f-hand); font-size: 1.2rem; line-height: 1.2; }
+.checklist li.hit .m { color: var(--green); } .checklist li.miss .m { color: var(--red); }
+.methods { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 14px 26px; }
+.methods li { min-width: 0; font-size: .95rem; }
+.methods b { display: block; font-family: var(--f-head); font-stretch: 82%; font-size: 1.05rem; }
+@media (max-width: 560px) { .methods { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
 
 <div class="wrap">
   <header class="top">
-    <a class="brand" href="#" aria-label="Srdce v čase – mapa">
-      <svg viewBox="0 0 26 26" aria-hidden="true"><path d="M13 22 C4 15 2 11 4.5 7.5 C7 4 11 5 13 8 C15 5 19 4 21.5 7.5 C24 11 22 15 13 22Z" fill="none" stroke="var(--oxy)" stroke-width="2.2" stroke-linejoin="round"/><path d="M3 14 H8 L10 10 L13 17 L15 13 H23" fill="none" stroke="var(--ink)" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></svg>
-      Srdce v čase
-    </a>
+    <a class="brand" href="#" aria-label="Srdce v čase – obsah">Srdce <span>v čase</span></a>
     <nav class="toplinks">
-      <a class="toplink" href="#karticky">Kartičky</a>
-      <a class="toplink" href="#tahak">Ťahák</a>
+      <a href="#karticky">Kartičky</a>
+      <a href="#tahak">Ťahák</a>
     </nav>
   </header>
   <main id="app" aria-live="polite"></main>
@@ -486,34 +541,58 @@ const EXTRA_TEST = [
 ];
 
 const CARDS = [
-  ["Čo je difúzia?", "Samovoľný presun látok z miesta s vyššou koncentráciou na miesto s nižšou. Stačí len na veľmi krátku vzdialenosť."],
-  ["Gastrovaskulárna dutina", "Dutina pŕhlivcov (nezmar), ktorá slúži na trávenie aj na rozvod živín."],
-  ["Prečo sú ploskavce ploché?", "Ploché telo skracuje vzdialenosť buniek od povrchu, takže im stačí difúzia."],
-  ["Otvorená obehová sústava", "Krv (hemolymfa) sa vylieva z ciev do telovej dutiny (hemocélu) a obmýva orgány. Majú ju článkonožce a väčšina mäkkýšov."],
-  ["Hemolymfa", "Tekutina článkonožcov a mäkkýšov, ktorá je krvou aj medzibunkovou tekutinou."],
-  ["Ostiá", "Párové otvory v srdci (chrbtovej cieve) hmyzu, ktorými sa hemolymfa nasáva späť."],
-  ["Ako sa kyslík dostane k bunkám hmyzu?", "Vzdušnicami (trachejami). Hemolymfa hmyzu kyslík nenesie."],
-  ["Hemocyanín", "Dýchacie farbivo s meďou (mäkkýše, kôrovce). Okysličená krv je modrastá."],
-  ["Hlavonožce a obeh", "Uzavretá sústava a tri srdcia: dve žiabrové a jedno telové."],
-  ["Dážďovka: smer krvi", "Chrbtová cieva dopredu, brušná dozadu. Vpredu 5 párov srdcových ciev."],
-  ["Hemoglobín dážďovky", "Je rozpustený v krvnej plazme, nie v krvinkách."],
-  ["Kopijovec a srdce", "Srdce nemá. Krv poháňa pulzujúca brušná cieva. Krv je bezfarebná."],
-  ["Kopijovec: smer krvi", "Brušná cieva dopredu, chrbtová aorta dozadu. Rovnako ako u stavovcov."],
-  ["Srdce ryby", "Dvojdielne: predsieň a komora, pred nimi žilový splav, za nimi tepnový násadec."],
-  ["Obeh ryby", "Jeden obeh: srdce → žiabre → telo → srdce. V srdci len odkysličená krv (žilové srdce)."],
-  ["Srdce obojživelníka", "Trojdielne: dve predsiene, jedna komora. Krv sa v komore čiastočne mieša."],
-  ["Malý obeh obojživelníka", "Vedie krv do pľúc a kože (pľúcnokožné tepny)."],
-  ["Srdce plazov", "Trojdielne s neúplnou priehradkou v komore. Krokodíl: štvordielne."],
-  ["Panizzov otvor", "Spojenie ľavého a pravého oblúka aorty u krokodílov. Krv sa mieša mimo srdca."],
-  ["Oblúky aorty", "Plazy: oba. Vtáky: pravý. Cicavce: ľavý."],
-  ["Srdce vtákov a cicavcov", "Štvordielne, úplná priehradka, krv sa nemieša. Dva oddelené obehy."],
-  ["Veľký (telový) obeh", "Ľavá komora → aorta → telo → duté žily → pravá predsieň."],
-  ["Malý (pľúcny) obeh", "Pravá komora → pľúcnica → pľúca → pľúcne žily → ľavá predsieň."],
-  ["Tepna vs. žila", "Tepna vedie krv ZO srdca, žila DO srdca. O kyslíku to nehovorí nič (pľúcnica vedie odkysličenú krv)."],
-  ["Trojcípa a dvojcípa chlopňa", "Trojcípa: medzi pravou predsieňou a komorou. Dvojcípa (mitrálna): medzi ľavou predsieňou a komorou."],
-  ["Prečo je ľavá komora hrubšia?", "Ženie krv do celého tela, potrebuje vyšší tlak ako pravá, ktorá ženie krv len do pľúc."],
-  ["Krvinky cicavcov", "Červené krvinky cicavcov nemajú jadro, vtákov a ostatných stavovcov áno."]
+  ["Čo je difúzia a na akú vzdialenosť stačí?", "Samovoľný presun látok z miesta s vyššou koncentráciou na miesto s nižšou. Stačí len na zlomky milimetra."],
+  ["Akú dutinu majú pŕhlivce a na čo slúži?", "Gastrovaskulárnu dutinu. Slúži na trávenie aj na rozvod živín."],
+  ["Prečo planárii stačí difúzia, hoci je dlhá niekoľko centimetrov?", "Je plochá a rozvetvená tráviaca dutina siaha do celého tela. Každá bunka je blízko povrchu alebo dutiny."],
+  ["Čo znamená, že obehová sústava je otvorená?", "Krv (hemolymfa) sa vylieva z ciev do telovej dutiny (hemocélu) a voľne obmýva orgány."],
+  ["Prečo sa krv hmyzu nevolá krv, ale hemolymfa?", "Je krvou aj medzibunkovou tekutinou zároveň, lebo sa vylieva medzi orgány."],
+  ["Ktorými otvormi sa hemolymfa vracia do srdca hmyzu?", "Ostiami, párovými otvormi v chrbtovej cieve."],
+  ["Ako sa dostane kyslík k svalom hmyzu, keď ho hemolymfa nenesie?", "Vzdušnicami (trachejami), ktoré vedú vzduch priamo k bunkám."],
+  ["Aký kov má hemocyanín a akú farbu má okysličená krv mäkkýšov?", "Meď. Okysličená krv je modrastá."],
+  ["Ktorý mäkkýš má uzavretú obehovú sústavu a koľko sŕdc?", "Hlavonožce (sépia, chobotnica): uzavretá sústava, tri srdcia – dve žiabrové a jedno telové."],
+  ["Ktorým smerom tečie krv v chrbtovej a v brušnej cieve dážďovky?", "Chrbtovou dopredu, brušnou dozadu. Vpredu ich spája 5 párov srdcových ciev."],
+  ["Kde je u dážďovky hemoglobín?", "Rozpustený v krvnej plazme, nie v krvinkách."],
+  ["Čo poháňa krv kopijovca, keď nemá srdce?", "Pulzujúca brušná cieva a bázy žiabrových tepien."],
+  ["Čím sa smer toku krvi kopijovca líši od dážďovky?", "Je opačný: brušnou cievou dopredu, chrbtovou aortou dozadu. Rovnako ako u stavovcov."],
+  ["Z akých oddielov sa skladá srdce ryby?", "Žilový splav → predsieň → komora → tepnový násadec. Pracovné oddiely sú dva: predsieň a komora."],
+  ["Prečo voláme srdce ryby „žilové“?", "Prechádza ním len odkysličená krv. Okysličí sa až v žiabrach, za srdcom."],
+  ["Koľko oddielov má srdce žaby a kde sa mieša krv?", "Tri: dve predsiene a jedna komora. Krv sa čiastočne mieša v komore."],
+  ["Kam vedie malý obeh obojživelníka krv?", "Do pľúc a do kože (pľúcnokožné tepny)."],
+  ["Čím je zvláštne srdce plazov?", "Je trojdielne, ale v komore má neúplnú priehradku. Krv sa mieša len málo."],
+  ["Ktorý plaz má štvordielne srdce a kde sa mu aj tak mieša krv?", "Krokodíl. Krv sa mieša mimo srdca cez Panizzov otvor medzi oblúkmi aorty."],
+  ["Ktorý oblúk aorty majú plazy, vtáky a cicavce?", "Plazy oba, vtáky pravý, cicavce ľavý."],
+  ["Prečo sa vtákom a cicavcom krv v srdci nemieša?", "Majú štvordielne srdce s úplnou priehradkou: pravá polovica má len odkysličenú, ľavá len okysličenú krv."],
+  ["Kde začína a kde končí veľký (telový) obeh?", "Začína v ľavej komore (aorta) a končí v pravej predsieni (duté žily)."],
+  ["Kde začína a kde končí malý (pľúcny) obeh?", "Začína v pravej komore (pľúcnica) a končí v ľavej predsieni (pľúcne žily)."],
+  ["Je pľúcnica tepna alebo žila, a akú krv vedie?", "Tepna, lebo vedie krv zo srdca. Vedie však odkysličenú krv."],
+  ["Ktorá chlopňa je vpravo a ktorá vľavo medzi predsieňou a komorou?", "Vpravo trojcípa, vľavo dvojcípa (mitrálna)."],
+  ["Prečo má ľavá komora hrubšiu stenu ako pravá?", "Ženie krv do celého tela a potrebuje vyšší tlak. Pravá ženie krv len do blízkych pľúc."],
+  ["Čím sa líšia červené krvinky cicavcov od krviniek vtákov?", "Krvinky cicavcov nemajú jadro, krvinky vtákov ho majú."]
 ];
+
+/* Doplňovačka: {slovo} = medzera. Ďalšie slová v banke sú chytáky. */
+const CLOZE = {
+  1: { t: "Hubky a pŕhlivce nemajú obehovú sústavu, látky sa k bunkám dostávajú {difúziou}. Pŕhlivce na trávenie aj rozvod živín používajú {gastrovaskulárnu} dutinu.", x: ["osmózou", "telovú"] },
+  2: { t: "V otvorenej sústave sa {hemolymfa} vylieva do telovej dutiny, ktorá sa volá {hemocél}. Srdce hmyzu ju nasáva otvormi, ktoré sa volajú {ostiá}.", x: ["lymfa", "chlopne"] },
+  3: { t: "Dážďovka má {uzavretú} obehovú sústavu. Chrbtová cieva vedie krv {dopredu} a brušná {dozadu}.", x: ["otvorenú", "do strán"] },
+  4: { t: "Kopijovec nemá {srdce}. Krv poháňa pulzujúca {brušná} cieva a krv je {bezfarebná}.", x: ["chrbtová", "červená"] },
+  5: { t: "Srdce ryby má {dva} oddiely a krv prechádza {jedným} obehom. V srdci je len {odkysličená} krv.", x: ["tri", "dvoma", "okysličená"] },
+  6: { t: "Srdce obojživelníka má {tri} oddiely: dve predsiene a jednu {komoru}, v ktorej sa krv čiastočne {mieša}.", x: ["štyri", "predsieň", "oddeľuje"] },
+  7: { t: "Väčšina plazov má v komore {neúplnú} priehradku. Úplnú priehradku majú {krokodíly}, krv sa im mieša cez {Panizzov} otvor.", x: ["úplnú", "jašterice"] },
+  8: { t: "Vtáky a cicavce majú {štvordielne} srdce. Veľký obeh začína v {ľavej} komore. Vtáky majú {pravý} oblúk aorty.", x: ["trojdielne", "pravej", "ľavý"] }
+};
+
+/* Vysvetli spolužiakovi: pojmy, ktoré by vo vysvetlení nemali chýbať (hľadá sa bez diakritiky). */
+const TEACH = {
+  1: [["difúzia", "difuz"], ["tenké alebo ploché telo", "plos|ploch|tenk|mal"], ["gastrovaskulárna dutina", "gastrovask|dutin"]],
+  2: [["hemolymfa", "hemolymf"], ["telová dutina (hemocél)", "dutin|hemoc"], ["chrbtová cieva / ostiá", "osti|chrbt"], ["kyslík nesú vzdušnice", "vzdusn|trach"]],
+  3: [["uzavretá sústava", "uzavret"], ["chrbtová cieva dopredu", "chrbt"], ["brušná cieva dozadu", "brusn"], ["5 párov srdcových ciev", "5|pat|srdcov"]],
+  4: [["nemá srdce", "srd"], ["brušná cieva pulzuje", "brusn"], ["bezfarebná krv", "bezfareb|farb"], ["smer ako stavovce", "stavovc|opac"]],
+  5: [["dva oddiely", "dva |dvoj|2"], ["predsieň a komora", "predsien|komor"], ["jeden obeh", "jeden|jedn|1 obeh"], ["žiabre", "ziabr"], ["odkysličená krv v srdci", "odkyslic|zilov"]],
+  6: [["tri oddiely", "tri|troj|3"], ["dva obehy", "dva obeh|2 obeh|dvoma|maly|velky"], ["krv sa mieša", "mies"], ["dýchanie kožou", "koz"]],
+  7: [["neúplná priehradka", "priehrad"], ["krv sa mieša menej", "mies|menej"], ["krokodíl má 4 oddiely", "krokod"], ["dva oblúky aorty", "obluk|oblúk"]],
+  8: [["štyri oddiely", "styri|stvor|4"], ["krv sa nemieša", "nemies|oddelen|nemiesa"], ["malý a veľký obeh", "maly|velky|pluc|telov"], ["oblúk aorty (vták pravý, cicavec ľavý)", "obluk|aort"]]
+};
 
 const SORT_CATS = ["Bez obehovej sústavy", "Otvorená sústava", "Uzavretá, bez komôrkového srdca", "Dvojdielne srdce", "Trojdielne srdce", "Štvordielne srdce"];
 const ANIMALS = [
@@ -600,28 +679,28 @@ const go = (h) => { location.hash = h; };
 /* =========================================================
    SCHÉMY (SVG)
    ========================================================= */
-let uid = 0;
+let uid = 0, CURP = "";
 function markers(p) {
-  return `<defs>${["oxy","deoxy","mix","mixb","mixr","hemo","pale","ink"].map(c =>
-    `<marker id="${p}-${c}" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="4.5" markerHeight="4.5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10z" class="f-${c}"/></marker>`).join("")}</defs>`;
+  return `<defs>${["oxy","deoxy","mix","mixb","mixr","hemo","pale","ink","blank"].map(c =>
+    `<marker id="${p}-${c}" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="4.5" markerHeight="4.5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10z" class="f-${c}"/></marker>`).join("")}<filter id="${p}-rough" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="7"/><feDisplacementMap in="SourceGraphic" scale="2.6"/></filter></defs>`;
 }
 function flow(p, d, c) { return `<path d="${d}" class="track s-${c}"/><path d="${d}" class="flow s-${c}" marker-end="url(#${p}-${c})"/>`; }
 function box(x, y, w, h, cls, l1, l2) {
   const cx = x + w / 2, cy = y + h / 2;
   const t = l2 ? `<text x="${cx}" y="${cy - 2}" text-anchor="middle" class="ttl">${l1}</text><text x="${cx}" y="${cy + 12}" text-anchor="middle" class="lbl">${l2}</text>`
                : `<text x="${cx}" y="${cy + 4}" text-anchor="middle" class="ttl">${l1}</text>`;
-  return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="7" class="${cls}"/>${t}`;
+  return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="7" class="${cls}" filter="url(#${CURP}-rough)"/>${t}`;
 }
 function vlabel(x, y, t, anchor = "middle") { return `<text x="${x}" y="${y}" class="lbl" text-anchor="${anchor}" transform="rotate(-90 ${x} ${y})">${t}</text>`; }
 
-function diagram(type) {
-  const p = "m" + (++uid);
+function diagram(type, paint) {
+  const p = "m" + (++uid); CURP = p;
   const open = (vb, label) => `<svg class="sv" viewBox="${vb}" role="img" aria-label="${label}">${markers(p)}`;
   if (type === "diffusion") {
     const dots = [[-50,-10],[50,-14],[-46,22],[48,26],[-30,-40],[34,-42]].map(([dx,dy], i) =>
       `<circle cx="180" cy="${140 + (i%3)*12 - 10}" r="3.2" class="f-deoxy dot" style="--dx:${dx*1.6}px;--dy:${dy}px;animation-delay:${i*0.42}s"/>`).join("");
     return open("0 0 360 260", "Nezmar v reze, difúzia z dutiny do buniek") +
-      `<path d="M110 230 C80 230 74 200 74 160 L74 70 C74 46 92 34 120 34 L150 34 L150 52 L120 52 C106 52 98 60 98 74 L98 162 C98 196 110 206 180 206 C250 206 262 196 262 162 L262 74 C262 60 254 52 240 52 L210 52 L210 34 L240 34 C268 34 286 46 286 70 L286 160 C286 200 280 230 250 230 Z" class="faint"/>
+      `<path d="M110 230 C80 230 74 200 74 160 L74 70 C74 46 92 34 120 34 L150 34 L150 52 L120 52 C106 52 98 60 98 74 L98 162 C98 196 110 206 180 206 C250 206 262 196 262 162 L262 74 C262 60 254 52 240 52 L210 52 L210 34 L240 34 C268 34 286 46 286 70 L286 160 C286 200 280 230 250 230 Z" class="faint" filter="url(#${p}-rough)"/>
        <path d="M98 74 C98 60 106 52 120 52 L150 52 M210 52 L240 52 C254 52 262 60 262 74 L262 162 C262 196 250 206 180 206 C110 206 98 196 98 162 Z" class="wall" stroke-dasharray="3 4"/>
        ${dots}
        <text x="180" y="24" text-anchor="middle" class="lbl">ústny otvor</text>
@@ -651,7 +730,7 @@ function diagram(type) {
   if (type === "worm") {
     const rings = [70, 92, 114, 136, 158].map(x => `<path d="M${x} 74 L${x} 126" class="s-oxy pulse" stroke-width="4" stroke-linecap="round" marker-end="url(#${p}-oxy)"/>`).join("");
     return open("0 0 360 200", "Uzavretá obehová sústava dážďovky") +
-      `<rect x="16" y="40" width="328" height="120" rx="60" class="faint"/>
+      `<rect x="16" y="40" width="328" height="120" rx="60" class="faint" filter="url(#${p}-rough)"/>
        ${[200,220,240,260,280,300].map(x => `<line x1="${x}" y1="44" x2="${x}" y2="156" class="s-ink" stroke-width=".6" opacity=".35"/>`).join("")}
        ${flow(p, "M330 66 L44 66", "oxy")}
        ${flow(p, "M44 134 L330 134", "oxy")}
@@ -665,7 +744,7 @@ function diagram(type) {
   }
   if (type === "lancelet") {
     return open("0 0 360 200", "Obehová sústava kopijovca") +
-      `<path d="M16 100 C80 54 260 50 344 100 C260 150 80 146 16 100 Z" class="faint"/>
+      `<path d="M16 100 C80 54 260 50 344 100 C260 150 80 146 16 100 Z" class="faint" filter="url(#${p}-rough)"/>
        ${[74,92,110,128,146].map(x => `<line x1="${x-6}" y1="84" x2="${x+6}" y2="116" class="s-ink" stroke-width="1.2" opacity=".5"/>`).join("")}
        ${flow(p, "M290 124 L60 124", "pale")}
        ${[80,104,128,152].map(x => `<path d="M${x} 122 L${x} 80" class="s-pale" stroke-width="2.5" marker-end="url(#${p}-pale)"/>`).join("")}
@@ -678,41 +757,65 @@ function diagram(type) {
        <text x="340" y="24" text-anchor="end" class="lbl">krv je bezfarebná</text></svg>`;
   }
   /* Stavovce: schéma ako obvod. Hore dýchací orgán, dole telo, v strede srdce. */
+  return vertebrate(type, p, open, paint);
+}
+
+/* Časti schémy stavovcov: komory (ch) a cievy (sg) so správnymi farbami. */
+function vertParts(type) {
+  if (type === "fish") return {
+    ch: [{ x: 96, y: 100, w: 168, h: 46, c: "deoxy", l1: "predsieň", l2: "pred ňou žilový splav" },
+         { x: 96, y: 152, w: 168, h: 60, c: "deoxy", l1: "komora", l2: "za ňou tepnový násadec" }],
+    sg: [{ d: "M126 272 H48 V123 H90", c: "deoxy", n: "žily z tela" },
+         { d: "M96 182 H72 V38 H120", c: "deoxy", n: "tepna do žiabier" },
+         { d: "M234 38 H312 V272 H240", c: "oxy", n: "chrbtová aorta" }]
+  };
+  const ch = [{ x: 96, y: 100, w: 80, h: 46, c: "deoxy", l1: "pravá", l2: "predsieň" },
+              { x: 184, y: 100, w: 80, h: 46, c: "oxy", l1: "ľavá", l2: "predsieň" }];
+  if (type === "four") ch.push({ x: 96, y: 152, w: 80, h: 60, c: "deoxy", l1: "pravá", l2: "komora" }, { x: 184, y: 152, w: 80, h: 60, c: "oxy", l1: "ľavá", l2: "komora" });
+  else if (type === "rept") ch.push({ x: 96, y: 152, w: 84, h: 60, c: "mixb" }, { x: 180, y: 152, w: 84, h: 60, c: "mixr" });
+  else ch.push({ x: 96, y: 152, w: 168, h: 60, c: "mix", l1: "komora", l2: "krv sa čiastočne mieša" });
+  const outL = type === "four" ? "deoxy" : type === "rept" ? "mixb" : "mix";
+  const outR = type === "four" ? "oxy" : type === "rept" ? "mixr" : "mix";
+  return { ch, sg: [
+    { d: "M126 272 H48 V123 H90", c: "deoxy", n: "duté žily" },
+    { d: "M96 182 H72 V38 H120", c: outL, n: type === "amph" ? "pľúcnokožné tepny" : "pľúcnica" },
+    { d: "M234 38 H288 V123 H270", c: "oxy", n: "pľúcne žily" },
+    { d: "M264 182 H312 V272 H240", c: outR, n: type === "four" ? "aorta" : "oblúky aorty" }] };
+}
+const base = (c) => (c === "mixb" || c === "mixr") ? "mix" : c;
+
+function vertebrate(type, p, open, paint) {
+  const { ch, sg } = vertParts(type);
   const top = type === "fish" ? "Žiabre" : (type === "amph" ? "Pľúca a koža" : "Pľúca");
   let s = open("0 0 360 310", "Schéma srdca a krvných obehov") +
     box(126, 20, 108, 36, "organ", top) + box(126, 254, 108, 36, "organ", "Telo");
-  if (type === "fish") {
-    s += box(96, 100, 168, 46, "ch-deoxy", "predsieň", "pred ňou žilový splav") +
-         box(96, 152, 168, 60, "ch-deoxy", "komora", "za ňou tepnový násadec") +
-         flow(p, "M126 272 H48 V123 H90", "deoxy") +
-         flow(p, "M96 182 H72 V38 H120", "deoxy") +
-         flow(p, "M234 38 H312 V272 H240", "oxy") +
-         vlabel(38, 200, "žily z tela") + vlabel(84, 78, "do žiabier") + vlabel(326, 160, "chrbtová aorta") +
-         `<text x="180" y="240" text-anchor="middle" class="lbl">jeden obeh</text>`;
-  } else {
-    s += box(96, 100, 80, 46, "ch-deoxy", "pravá", "predsieň") + box(184, 100, 80, 46, "ch-oxy", "ľavá", "predsieň");
-    if (type === "four") {
-      s += box(96, 152, 80, 60, "ch-deoxy", "pravá", "komora") + box(184, 152, 80, 60, "ch-oxy", "ľavá", "komora") +
-           `<line x1="180" y1="100" x2="180" y2="212" class="sept"/>`;
-    } else if (type === "rept") {
-      s += `<rect x="96" y="152" width="84" height="60" rx="7" class="ch-mixb"/><rect x="180" y="152" width="84" height="60" rx="7" class="ch-mixr"/>
-            <line x1="180" y1="100" x2="180" y2="146" class="sept"/><line x1="180" y1="212" x2="180" y2="176" class="sept"/>
-            <text x="180" y="168" text-anchor="middle" class="ttl">komora</text>
-            <text x="180" y="226" text-anchor="middle" class="lbl">neúplná priehradka</text>`;
-    } else {
-      s += box(96, 152, 168, 60, "ch-mix", "komora", "krv sa čiastočne mieša") + `<line x1="180" y1="100" x2="180" y2="146" class="sept"/>`;
+  ch.forEach((c, i) => {
+    let cls = "ch-" + c.c, extra = "";
+    if (paint) {
+      const u = paint.ch[i];
+      cls = (u ? "ch-" + u : "organ") + " paint" + (paint.checked && base(u) !== base(c.c) ? " bad" : "");
+      extra = ` data-act="paint" data-part="ch${i}"`;
     }
-    const outL = type === "four" ? "deoxy" : type === "rept" ? "mixb" : "mix";
-    const outR = type === "four" ? "oxy" : type === "rept" ? "mixr" : "mix";
-    s += flow(p, "M126 272 H48 V123 H90", "deoxy") +
-         flow(p, "M96 182 H72 V38 H120", outL) +
-         flow(p, "M234 38 H288 V123 H270", "oxy") +
-         flow(p, "M264 182 H312 V272 H240", outR) +
-         vlabel(38, 200, "duté žily") + vlabel(84, 78, type === "amph" ? "pľúcnokožné t." : "pľúcnica") +
-         vlabel(300, 78, "pľúcne žily") + vlabel(326, 200, type === "four" ? "aorta" : "oblúky aorty") +
-         `<text x="180" y="78" text-anchor="middle" class="lbl">malý (pľúcny) obeh</text>` +
-         (type !== "rept" ? `<text x="180" y="240" text-anchor="middle" class="lbl">veľký (telový) obeh</text>` : "");
-  }
+    s += `<rect x="${c.x}" y="${c.y}" width="${c.w}" height="${c.h}" rx="7" class="${cls}" filter="url(#${p}-rough)"${extra}/>`;
+    if (c.l1) s += `<text x="${c.x + c.w / 2}" y="${c.y + c.h / 2 - 2}" text-anchor="middle" class="ttl" pointer-events="none">${c.l1}</text><text x="${c.x + c.w / 2}" y="${c.y + c.h / 2 + 12}" text-anchor="middle" class="lbl" pointer-events="none">${c.l2}</text>`;
+  });
+  if (type === "four") s += `<line x1="180" y1="100" x2="180" y2="212" class="sept"/>`;
+  else if (type === "rept") s += `<line x1="180" y1="100" x2="180" y2="146" class="sept"/><line x1="180" y1="212" x2="180" y2="176" class="sept"/>
+      <text x="180" y="168" text-anchor="middle" class="ttl" pointer-events="none">komora</text><text x="180" y="226" text-anchor="middle" class="lbl">neúplná priehradka</text>`;
+  else if (type === "amph") s += `<line x1="180" y1="100" x2="180" y2="146" class="sept"/>`;
+  sg.forEach((g, i) => {
+    if (!paint) { s += flow(p, g.d, g.c); return; }
+    const u = paint.sg[i], c = u || "blank";
+    const bad = paint.checked && base(u) !== base(g.c);
+    s += `<path d="${g.d}" class="track s-${c}${bad ? " bad" : ""}"/><path d="${g.d}" class="${u ? "flow" : "track"} s-${c}" style="opacity:1" marker-end="url(#${p}-${c})"/>
+          <path d="${g.d}" class="hit" data-act="paint" data-part="sg${i}"><title>${g.n}</title></path>`;
+  });
+  if (type === "fish") s += vlabel(38, 200, "žily z tela") + vlabel(84, 78, "do žiabier") + vlabel(326, 160, "chrbtová aorta") +
+      `<text x="180" y="240" text-anchor="middle" class="lbl">jeden obeh</text>`;
+  else s += vlabel(38, 200, "duté žily") + vlabel(84, 78, type === "amph" ? "pľúcnokožné t." : "pľúcnica") +
+      vlabel(300, 78, "pľúcne žily") + vlabel(326, 200, type === "four" ? "aorta" : "oblúky aorty") +
+      `<text x="180" y="80" text-anchor="middle" class="lbl">malý (pľúcny) obeh</text>` +
+      (type !== "rept" ? `<text x="180" y="240" text-anchor="middle" class="lbl">veľký (telový) obeh</text>` : "");
   return s + "</svg>";
 }
 const LEG = { deoxy: "odkysličená krv", oxy: "okysličená krv", mix: "zmiešaná krv" };
@@ -721,118 +824,209 @@ const legend = (keys) => keys ? `<div class="legend">${keys.map(k => `<span><i s
 /* =========================================================
    VIEWS
    ========================================================= */
+const norm = (t) => t.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+const VERT = ["fish", "amph", "rept", "four"];
+const METHOD = {
+  warm: ["rozcvička", "Najprv si vybav niečo z minulej zastávky. Opakovanie s odstupom upevňuje pamäť."],
+  intro: ["predpoveď", "Tipni si skôr, než sa to naučíš. Aj zlý tip ti pomôže lepšie si zapamätať správnu odpoveď."],
+  diagram: ["obraz + slovo", "Prezri si schému a čítaj popis. Obraz a text spolu sa pamätajú lepšie ako samotný text."],
+  color: ["kreslenie", "Vyfarbi schému sám. Keď niečo nakreslíš, musíš o tom premýšľať."],
+  points: ["konkrétne príklady", "Ku každému pojmu si predstav konkrétneho živočícha."],
+  why: ["otázka prečo", "Hľadaj dôvod, nielen fakt. Vysvetlenie drží v pamäti dlhšie."],
+  check: ["vybavovanie", "Odpovedz bez pozerania späť. Vybavovanie z pamäti je najsilnejší spôsob učenia."],
+  cloze: ["doplňovanie", "Slovo, ktoré si vybavíš sám, si zapamätáš lepšie ako to, ktoré len prečítaš."],
+  teach: ["uč druhého", "Vysvetli to spolužiakovi. Kto vysvetľuje, ten zistí, čo ešte nevie."]
+};
+const methodHtml = (k) => `<p class="method">metóda: <b>${METHOD[k][0]}</b> · ${METHOD[k][1]}</p>`;
+const ring = () => `<svg class="ring" viewBox="0 0 34 34" aria-hidden="true"><path d="M27 8 C21 2 7 3 4 13 C1 24 11 32 21 30 C31 28 33 16 26 8 C24 6 21 5 18 5"/></svg>`;
+
 function homeView() {
   const n = doneCount(), next = nextStation();
-  const due = CARDS.length - learned();
   app.innerHTML = `
-  <section class="hero">
-    <span class="eyebrow">Obehová sústava · fylogenéza</span>
+  <section class="intro">
+    <p class="hand subject">Biológia · obehová sústava a jej vývoj</p>
     <h1>Od difúzie po <span class="beat">štvordielne srdce</span></h1>
-    <p class="lede">Prejdi osem zastávok evolúcie. Na každej si najprv tipneš, potom uvidíš schému, krátky výklad a overíš si, či to sedí. Jedna zastávka trvá asi tri minúty.</p>
-    <div class="progress-line">
+    <p class="lede">Osem zastávok evolúcie. Na každej si najprv tipneš, potom si prezrieš a sám vyfarbíš schému, odpovieš z hlavy a nakoniec to vysvetlíš spolužiakovi. Jedna zastávka trvá asi päť minút.</p>
+    <div class="state">
       ${next ? `<a class="btn" href="#stanica-${next.id}">${n ? "Pokračovať" : "Začať"}: ${next.short} →</a>`
-             : `<a class="btn" href="#test">Všetko prejdené. Skúška →</a>`}
-      <div class="stack" style="gap:6px">
-        <div class="pips">${STATIONS.map(s => `<span class="pip ${S.done[s.id] ? "on" : ""}"></span>`).join("")}</div>
-        <span class="mono">${n} z ${STATIONS.length} zastávok</span>
-      </div>
+             : `<a class="btn" href="#test">Všetko prejdené. Písomka →</a>`}
+      <span class="tally">${n ? `prejdené ${n} z ${STATIONS.length}` : "zatiaľ nič, začni prvou zastávkou"}</span>
     </div>
   </section>
 
-  <div class="section-head"><h2>Mapa cesty</h2><span class="mono">pred mil. rokov</span></div>
-  <ol class="timeline">
-    ${STATIONS.map(s => `<li class="stop ${S.done[s.id] ? "done" : ""} ${next && next.id === s.id ? "next" : ""}">
+  <div class="sec"><span class="marg">mil.<br>rokov</span><h2>Obsah</h2></div>
+  <ol class="toc">
+    ${STATIONS.map(s => `<li class="${S.done[s.id] ? "done" : ""} ${next && next.id === s.id ? "next" : ""}">
+      <span class="marg">${s.era}</span>
       <a href="#stanica-${s.id}">
-        <span class="era">${s.era}</span><span class="node"></span>
-        <span class="name"><strong>${s.short}</strong><span>${s.group === s.short ? s.examples : s.group}</span></span>
-        <span class="chip">${s.chip}</span>
-      </a></li>`).join("")}
+        <span class="num">${s.id}.</span>
+        <span class="t"><strong>${s.short}</strong><small>${s.group === s.short ? s.examples : s.group}</small></span>
+        <span class="dots"></span><span class="kind">${s.chip}</span>
+      </a>${S.done[s.id] ? `<span class="tick" aria-label="hotovo">✓</span>` : ""}</li>`).join("")}
   </ol>
-  <p class="note" style="margin-top:14px">Nie je to rebrík. Hmyz ani dážďovka nie sú naši predkovia, sú to iné vetvy s vlastnými riešeniami. Čísla udávajú približný vek najstarších fosílií skupiny.</p>
+  <p class="pen-note"><b>Pozor:</b> nie je to rebrík. Hmyz ani dážďovka nie sú naši predkovia, sú to iné vetvy s vlastnými riešeniami. Čísla na okraji sú približný vek najstarších fosílií skupiny.</p>
 
-  <div class="section-head"><h2>Precvičovanie</h2></div>
-  <div class="modes">
-    <a class="mode" href="#kvapka"><h3>Cesta kvapky <span class="chip">hra</span></h3><p>Preveď kvapku krvi srdcom ryby, žaby alebo človeka, krok za krokom.</p></a>
-    <a class="mode" href="#triedenie"><h3>Kam patrí? <span class="chip">hra</span></h3><p>Priraď živočícha k typu obehovej sústavy. Pozor na výnimky.</p></a>
-    <a class="mode" href="#karticky"><h3>Kartičky <span class="chip">opakovanie</span></h3><p>Kartičky, ktoré nevieš, sa vracajú častejšie.</p><span class="mono meta">naučené ${learned()} / ${CARDS.length}</span></a>
-    <a class="mode" href="#test"><h3>Skúška <span class="chip">12 otázok</span></h3><p>Zmiešané otázky zo všetkých zastávok, s vysvetlením chýb.</p><span class="mono meta">${S.best != null ? "najlepšie " + S.best + " / 12" : "ešte neskúšané"}</span></a>
-  </div>
-  <p style="margin-top:20px"><a class="btn ghost wide" href="#tahak">Ťahák: všetko na jednej strane</a></p>`;
+  <div class="sec"><h2>Precvičovanie</h2></div>
+  <ol class="tasks">
+    <li><a href="#kvapka"><strong>Cesta kvapky</strong><span>Preveď kvapku krvi obehom ryby, žaby alebo človeka.</span><em>hra</em></a></li>
+    <li><a href="#triedenie"><strong>Kam patrí?</strong><span>Zaraď živočícha k typu obehovej sústavy. Pozor na výnimky.</span><em>triedenie</em></a></li>
+    <li><a href="#karticky"><strong>Kartičky s otázkami</strong><span>Tie, ktoré nevieš, sa vracajú častejšie. Najlepšie každý deň trochu.</span><em>vieš ${learned()} / ${CARDS.length}</em></a></li>
+    <li><a href="#test"><strong>Písomka</strong><span>12 zmiešaných otázok zo všetkých zastávok, na konci známka.</span><em>${S.best != null ? "najlepšie " + S.best + "/12" : "neskúšané"}</em></a></li>
+    <li><a href="#tahak"><strong>Ťahák</strong><span>Porovnávacia tabuľka a pomôcky na jednej strane.</span><em>prehľad</em></a></li>
+  </ol>
+
+  <div class="sec"><h2>Prečo sa tu učíš takto</h2></div>
+  <ul class="methods">
+    <li><b>Vybavovanie z pamäti</b>Odpovedáš z hlavy, nie čítaním. Je to najlepšie overená metóda učenia.</li>
+    <li><b>Opakovanie s odstupom</b>Rozcvičky a kartičky ťa vracajú k učivu po čase, keď ho začínaš zabúdať.</li>
+    <li><b>Predpoveď</b>Tip pred výkladom pripraví mozog na správnu odpoveď.</li>
+    <li><b>Obraz a slovo spolu</b>Schémy, ktoré si sám vyfarbíš, sa pamätajú lepšie ako text.</li>
+    <li><b>Otázka „prečo?“</b>Keď poznáš dôvod, fakt si nemusíš biflovať.</li>
+    <li><b>Striedanie tém</b>Písomka a triedenie miešajú skupiny, aby si ich vedel rozlíšiť.</li>
+    <li><b>Vysvetľovanie</b>Napíšeš to vlastnými slovami, akoby si to učil spolužiaka.</li>
+    <li><b>Konkrétne príklady</b>Každý pojem má svojho živočícha: nezmar, včela, dážďovka, kapor…</li>
+  </ul>
+  <p class="small muted" style="margin-top:14px">Podľa prehľadov Dunlosky a kol. (2013) a Weinstein, Madan a Sumeracki (2018).</p>`;
 }
 
 /* ---------- Stanica ---------- */
 function stationSteps(st) {
-  return ["intro", "diagram", "points", "why", ...st.checks.map((_, i) => "check" + i), "done"];
+  return [...(ui.warm ? ["warm"] : []), "intro", "diagram", ...(VERT.includes(st.diagram) ? ["color"] : []), "points", "why",
+    ...st.checks.map((_, i) => "check" + i), "cloze", "teach", "done"];
 }
 function optsHtml(opts, chosen, answer, name) {
   return `<div class="opts">${opts.map((o, i) => {
     let cls = "";
     if (chosen != null) cls = o.i === answer ? "right" : (i === chosen ? "wrong" : "dim");
-    return `<button class="opt ${cls}" data-act="${name}" data-i="${i}" ${chosen != null ? "disabled" : ""}><span class="k">${"ABC"[i]}</span><span>${o.t}</span></button>`;
+    const mark = chosen != null && o.i === answer ? `<span class="mark" aria-hidden="true">✓</span>` : "";
+    return `<button class="opt ${cls}" data-act="${name}" data-i="${i}" ${chosen != null ? "disabled" : ""}>${mark}<span class="k">${"abc"[i]})${i === chosen ? ring() : ""}</span><span class="txt">${o.t}</span></button>`;
   }).join("")}</div>`;
+}
+const verdict = (ok, good, bad) => `<span class="verdict">${ok ? good : bad}</span>`;
+function clozeParts(id) {
+  const c = CLOZE[id], answers = [], parts = c.t.split(/\{([^}]+)\}/);
+  parts.forEach((t, i) => { if (i % 2) answers.push(t); });
+  return { parts, answers, bank: shuffle([...answers, ...c.x]) };
 }
 function stationView(id) {
   const st = STATIONS.find(s => s.id === id);
   if (!st) return go("");
   if (ui.view !== "st" + id) {
-    ui = { view: "st" + id, step: 0, pred: null, chk: {}, shown: false,
+    const prev = STATIONS.filter(s => s.id < id && S.done[s.id]);
+    let warm = null;
+    if (prev.length) { const ps = prev[Math.floor(Math.random() * prev.length)]; const c = ps.checks[Math.floor(Math.random() * ps.checks.length)]; warm = { ...c, from: ps.short, opts: shuffle(c.o.map((t, i) => ({ t, i }))) }; }
+    const cz = clozeParts(id);
+    const nCh = VERT.includes(st.diagram) ? vertParts(st.diagram) : null;
+    ui = { view: "st" + id, step: 0, warm, warmAns: null, pred: null, chk: {}, shown: false,
       predOpts: shuffle(st.predict.o.map((t, i) => ({ t, i }))),
-      chkOpts: st.checks.map(c => shuffle(c.o.map((t, i) => ({ t, i })))) };
+      chkOpts: st.checks.map(c => shuffle(c.o.map((t, i) => ({ t, i })))),
+      cz, fill: cz.answers.map(() => null), czChecked: false,
+      paint: nCh ? { ch: nCh.ch.map(() => null), sg: nCh.sg.map(() => null), checked: false, solved: false } : null,
+      pen: "deoxy", teach: "", teachChecked: false };
   }
   const steps = stationSteps(st), step = steps[ui.step];
   let body = "", canNext = true;
-  if (step === "intro") {
-    const answered = ui.pred != null;
-    canNext = answered;
-    const correct = answered && ui.predOpts[ui.pred].i === st.predict.a;
-    body = `<div class="card">
-      <span class="eyebrow">Zastávka ${st.id} z ${STATIONS.length} · vek skupiny ${st.era} mil. r.</span>
+  const kicker = `<p class="kicker">Zastávka ${st.id} · ${st.short}</p>`;
+  if (step === "warm") {
+    const w = ui.warm, ch = ui.warmAns; canNext = ch != null;
+    const ok = ch != null && w.opts[ch].i === w.a;
+    body = `${methodHtml("warm")}<h2>Rozcvička</h2><p class="kicker">Otázka zo zastávky ${w.from}</p><p class="q">${w.q}</p>
+      ${optsHtml(w.opts, ch, w.a, "warm")}
+      ${ch != null ? `<div class="feedback ${ok ? "good" : ""}">${verdict(ok, "Pamätáš si to!", "Toto si ešte zopakuj.")}${w.e}</div>` : ""}`;
+  } else if (step === "intro") {
+    canNext = ui.pred != null;
+    const ok = canNext && ui.predOpts[ui.pred].i === st.predict.a;
+    body = `<p class="kicker">Zastávka ${st.id} z ${STATIONS.length} · vek skupiny ${st.era} mil. rokov</p>
       <h2>${st.short}</h2>
       <p class="muted">${st.group}: ${st.examples}</p>
       <p class="lead">${st.lead}</p>
-      <div class="predict">
-        <span class="eyebrow">Najprv tipni, aj keď to nevieš</span>
-        <h3>${st.predict.q}</h3>
-        ${optsHtml(ui.predOpts, ui.pred, st.predict.a, "pred")}
-        ${answered ? `<div class="feedback ${correct ? "good" : "miss"}"><strong>${correct ? "Dobrý odhad." : "Tentoraz nie, a to je v poriadku."}</strong>${st.predict.note}</div>` : ""}
-      </div></div>`;
+      ${methodHtml("intro")}
+      <p class="q">${st.predict.q}</p>
+      ${optsHtml(ui.predOpts, ui.pred, st.predict.a, "pred")}
+      ${ui.pred != null ? `<div class="feedback ${ok ? "good" : ""}">${verdict(ok, "Dobrý tip!", "Vedľa, ale presne na to tip slúži.")}${st.predict.note}</div>` : ""}`;
   } else if (step === "diagram") {
-    body = `<div class="card"><span class="eyebrow">Schéma</span><h2>${st.short}</h2>
-      <div class="diagram">${diagram(st.diagram)}</div>${legend(st.legend)}<p class="muted">${st.caption}</p></div>`;
+    body = `${methodHtml("diagram")}${kicker}
+      <figure><div class="diagram">${diagram(st.diagram)}</div>${legend(st.legend)}
+      <figcaption><b>Obr. ${st.id}</b> ${st.caption}</figcaption></figure>`;
+  } else if (step === "color") {
+    const P = ui.paint, parts = vertParts(st.diagram);
+    const pens = st.legend;
+    const total = parts.ch.length + parts.sg.length;
+    const right = parts.ch.filter((c, i) => base(P.ch[i]) === base(c.c)).length + parts.sg.filter((g, i) => base(P.sg[i]) === base(g.c)).length;
+    const filled = P.ch.filter(Boolean).length + P.sg.filter(Boolean).length;
+    canNext = P.checked;
+    body = `${methodHtml("color")}<h2>Vyfarbi schému</h2>
+      <p>Vyber pero a ťukaj na oddiely srdca a na cievy. Akú krv obsahujú?</p>
+      <div class="palette">${pens.map(k => `<button class="${ui.pen === k ? "on" : ""}" data-act="pen" data-k="${k}"><i style="background:var(--${k})"></i>${LEG[k]}</button>`).join("")}</div>
+      <figure><div class="diagram">${diagram(st.diagram, P.solved ? null : P)}</div>
+      <figcaption><b>Obr. ${st.id}a</b> ${P.solved ? "Správne riešenie." : `Vyfarbené ${filled} z ${total}.`}</figcaption></figure>
+      ${P.checked ? `<div class="feedback ${right === total ? "good" : ""}">${verdict(right === total, "Všetko sedí!", `${right} z ${total} správne`)}${right === total ? "Toto si už nakreslíš aj na písomke." : "Chybné časti sú označené červenou prerušovanou čiarou. Oprav ich, alebo si pozri riešenie."}</div>
+        ${right < total ? `<div class="row"><button class="btn ghost" data-act="recheck">Skontrolovať znova</button><button class="btn ghost" data-act="solve">${P.solved ? "Späť na moje" : "Ukázať riešenie"}</button></div>` : ""}`
+      : `<button class="btn ghost" data-act="checkpaint" ${filled < total ? "disabled" : ""}>${filled < total ? "Vyfarbi všetko a skontroluj" : "Skontrolovať"}</button>`}`;
   } else if (step === "points") {
-    body = `<div class="card"><span class="eyebrow">Čo si zapamätať</span><h2>${st.short}</h2>
-      <ul class="points">${st.points.map(p => `<li><span>${p}</span></li>`).join("")}</ul></div>`;
+    body = `${methodHtml("points")}${kicker}<h2>Čo si zapamätať</h2>
+      <ol class="points">${st.points.map(p => `<li><span>${p}</span></li>`).join("")}</ol>
+      <p class="muted">Príklady: ${st.examples}.</p>`;
   } else if (step === "why") {
-    body = `<div class="card"><span class="eyebrow">Prečo to tak je?</span><h2>${st.why.q}</h2>
-      ${ui.shown ? `<div class="feedback good"><strong>Vysvetlenie</strong>${st.why.a}</div>`
-                 : `<div class="hidden-answer stack"><p class="muted">Skús si odpoveď povedať v duchu alebo nahlas. Vysvetľovanie vlastnými slovami je jeden z najúčinnejších spôsobov učenia.</p><button class="btn ghost" data-act="reveal">Ukázať vysvetlenie</button></div>`}
-    </div>`;
+    body = `${methodHtml("why")}${kicker}<h2>${st.why.q}</h2>
+      ${ui.shown ? `<div class="feedback good">${verdict(true, "Vysvetlenie", "")}${st.why.a}</div>`
+                 : `<div class="think"><p>Povedz si odpoveď v duchu alebo nahlas. Až potom si ju odkry.</p><button class="btn ghost" data-act="reveal">Odkryť vysvetlenie</button></div>`}`;
   } else if (step.startsWith("check")) {
     const k = +step.slice(5), c = st.checks[k], ch = ui.chk[k];
     canNext = ch != null;
-    const correct = ch != null && ui.chkOpts[k][ch].i === c.a;
-    body = `<div class="card"><span class="eyebrow">Over si · otázka ${k + 1} z ${st.checks.length}</span><h2>${c.q}</h2>
+    const ok = ch != null && ui.chkOpts[k][ch].i === c.a;
+    body = `${methodHtml("check")}<p class="kicker">Otázka ${k + 1} z ${st.checks.length}</p><p class="q">${c.q}</p>
       ${optsHtml(ui.chkOpts[k], ch, c.a, "chk")}
-      ${ch != null ? `<div class="feedback ${correct ? "good" : "miss"}"><strong>${correct ? "Správne." : "Nie celkom."}</strong>${c.e}</div>` : ""}</div>`;
+      ${ch != null ? `<div class="feedback ${ok ? "good" : ""}">${verdict(ok, "Správne!", "Nie celkom.")}${c.e}</div>` : ""}`;
+  } else if (step === "cloze") {
+    const { parts, answers, bank } = ui.cz;
+    canNext = ui.czChecked;
+    let gi = -1;
+    const text = parts.map((t, i) => {
+      if (!(i % 2)) return t;
+      gi++; const v = ui.fill[gi];
+      let cls = v == null ? "empty" : "";
+      let fix = "";
+      if (ui.czChecked) { cls = v === answers[gi] ? "ok" : "no"; if (cls === "no") fix = `<span class="fix">${answers[gi]}</span>`; }
+      return `<button class="gap ${cls}" data-act="ungap" data-g="${gi}" ${ui.czChecked ? "disabled" : ""}>${v ?? "…"}</button>${fix}`;
+    }).join("");
+    const used = ui.fill.filter(v => v != null);
+    const right = ui.fill.filter((v, i) => v === answers[i]).length;
+    body = `${methodHtml("cloze")}<h2>Doplň</h2>
+      <p class="cloze">${text}</p>
+      ${ui.czChecked ? `<div class="feedback ${right === answers.length ? "good" : ""}">${verdict(right === answers.length, "Bez chyby!", `${right} z ${answers.length}`)}${right === answers.length ? "" : "Správne slová sú dopísané červenou."}</div>`
+        : `<div class="bank">${bank.map((w, i) => `<button class="tile" data-act="word" data-w="${i}" ${used.includes(w) && used.filter(x => x === w).length >= bank.filter(x => x === w).length ? "disabled" : ""}>${w}</button>`).join("")}</div>
+           <p class="small muted">Ťukni na slovo, doplní sa do prvej voľnej medzery. Ťuknutím na medzeru slovo vrátiš.</p>
+           <button class="btn ghost" data-act="checkcloze" ${used.length < answers.length ? "disabled" : ""}>Skontrolovať</button>`}`;
+  } else if (step === "teach") {
+    const keys = TEACH[st.id], txt = norm(ui.teach);
+    const hits = keys.map(([, re]) => new RegExp(re).test(txt));
+    body = `${methodHtml("teach")}<h2>Vysvetli to spolužiakovi</h2>
+      <p>Spolužiak chýbal na hodine. Napíš mu dve-tri vety o tom, ako funguje obeh u skupiny <b>${st.short.toLowerCase()}</b>. Píš z hlavy, nepozeraj sa späť.</p>
+      <textarea id="teach-${st.id}" data-input="teach" placeholder="Napríklad: Ryba má srdce…">${ui.teach}</textarea>
+      ${ui.teachChecked ? `<div class="stack" style="gap:10px"><p class="method">Pojmy, ktoré by tam mali byť:</p>
+         <ul class="checklist">${keys.map(([l], i) => `<li class="${hits[i] ? "hit" : "miss"}"><span class="m">${hits[i] ? "✓" : "✗"}</span><span>${l}</span></li>`).join("")}</ul>
+         <p class="small muted">Kontrola hľadá len kľúčové slová, nie celý zmysel. Prečítaj si svoj text ešte raz a porovnaj ho s rámčekom na ďalšej strane.</p></div>`
+        : `<div class="row"><button class="btn ghost" data-act="checkteach">Skontrolovať pojmy</button><button class="btn ghost" data-act="next" style="border-color:transparent">Preskočiť</button></div>`}`;
   } else {
     const right = st.checks.filter((c, k) => ui.chk[k] != null && ui.chkOpts[k][ui.chk[k]].i === c.a).length;
     S.done[st.id] = true; save();
     const nx = STATIONS.find(s => s.id === st.id + 1);
-    body = `<div class="card"><span class="eyebrow">Zastávka hotová · ${right} z ${st.checks.length} správne</span>
-      <p class="remember">${st.remember}</p>
-      <p class="muted">Túto vetu si zopakuj zajtra. Pomôžu ti s tým kartičky.</p></div>`;
-    app.innerHTML = `${barHtml(steps.length)}${body}
-      <div class="navbar"><a class="btn ghost" href="#">Mapa</a>${nx ? `<a class="btn" href="#stanica-${nx.id}">Ďalej: ${nx.short} →</a>` : `<a class="btn" href="#kvapka">Cesta kvapky →</a>`}</div>`;
+    body = `<p class="kicker">Zastávka ${st.id} hotová · ${right} z ${st.checks.length} otázok správne</p>
+      <div class="remember-box"><span class="tag">Zapamätaj si</span><p class="remember">${st.remember}</p></div>
+      <p class="muted">Zajtra si túto zastávku zopakuj v kartičkách. Rozcvička na ďalšej zastávke sa ťa na ňu možno spýta.</p>`;
+    app.innerHTML = `${pageHead(steps.length)}<div class="stack">${body}</div>
+      <div class="navbar"><a class="btn ghost" href="#">Obsah</a>${nx ? `<a class="btn" href="#stanica-${nx.id}">Ďalej: ${nx.short} →</a>` : `<a class="btn" href="#kvapka">Cesta kvapky →</a>`}</div>`;
     return;
   }
-  app.innerHTML = `${barHtml(steps.length)}${body}
+  app.innerHTML = `${pageHead(steps.length)}<div class="stack">${body}</div>
     <div class="navbar">
-      ${ui.step === 0 ? `<a class="btn ghost" href="#">Mapa</a>` : `<button class="btn ghost" data-act="prev">Späť</button>`}
-      <button class="btn" data-act="next" ${canNext ? "" : "disabled"}>${canNext ? "Ďalej" : "Vyber odpoveď"}</button>
+      ${ui.step === 0 ? `<a class="btn ghost" href="#">Obsah</a>` : `<button class="btn ghost" data-act="prev">← Späť</button>`}
+      <button class="btn" data-act="next" ${canNext ? "" : "disabled"}>${canNext ? "Ďalej →" : "Najprv odpovedz"}</button>
     </div>
-    <p class="kbd">klávesy A B C · Enter = ďalej</p>`;
+    <p class="kbd">klávesy a, b, c · Enter = ďalej</p>`;
 }
-function barHtml(n) { return `<div class="bar" aria-hidden="true">${Array.from({ length: n }, (_, i) => `<i class="${i <= ui.step ? "on" : ""}"></i>`).join("")}</div>`; }
+function pageHead(n) { return `<div class="pagehead"><a href="#">← Obsah</a><span class="pageno">strana ${ui.step + 1} / ${n}</span></div>`; }
 
 /* ---------- Cesta kvapky ---------- */
 function dropView() {
@@ -843,24 +1037,21 @@ function dropView() {
     ui.pool = shuffle([...r.steps.map((s, i) => ({ t: s[0], id: "s" + i })), ...r.decoys.map((t, i) => ({ t, id: "d" + i }))]);
   }
   const r = ROUTES[ui.org], done = ui.pos >= r.steps.length;
-  app.innerHTML = `
-  <div class="stack">
-    <span class="eyebrow">Hra · Cesta kvapky</span>
-    <h2>Preveď kvapku krvi celým obehom</h2>
-    <div class="tabs">${Object.entries(ROUTES).map(([k, v]) => `<button class="tab ${k === ui.org ? "on" : ""}" data-act="org" data-k="${k}">${v.name}</button>`).join("")}</div>
-    <div class="card">
-      <p class="muted">${r.start} Ťukaj na zastávky v správnom poradí. Farba bodky ukazuje, akú krv kvapka práve nesie.</p>
-      <ol class="path">
-        ${r.steps.map((s, i) => i < ui.pos
-          ? `<li><span class="n">${i + 1}</span><span class="d" style="background:var(--${s[1]})"></span><span>${s[0]}</span></li>`
-          : i === ui.pos ? `<li class="slot"><span class="n">${i + 1}</span><span class="d"></span><span>?</span></li>` : "").join("")}
-      </ol>
-      ${done ? `<div class="feedback good"><strong>Kvapka je späť na začiatku. Obeh je uzavretý.</strong>${ui.err ? `Chyby: ${ui.err}. Skús to ešte raz bez chyby.` : "Bez jedinej chyby."}</div>
-        <div class="row"><button class="btn" data-act="again">Ešte raz</button>${Object.keys(ROUTES).filter(k => k !== ui.org).map(k => `<button class="btn ghost" data-act="org" data-k="${k}">${ROUTES[k].name}</button>`).join("")}</div>`
-      : `${ui.hint ? `<div class="hint">${ui.hint}</div>` : ""}
-        <div class="pool">${ui.pool.filter(t => !t.used).map(t => `<button class="tile" data-act="tile" data-id="${t.id}">${t.t}</button>`).join("")}</div>`}
-    </div>
-    <p class="muted" style="font-size:.9rem">Medzi zastávkami sú aj dve, ktoré do tohto obehu nepatria.</p>
+  app.innerHTML = `<div class="stack">
+    <p class="method">metóda: <b>poradie krokov</b> · Keď vieš cestu krvi poskladať sám, rozumieš celému obehu.</p>
+    <h2>Cesta kvapky</h2>
+    <div class="choice">${Object.entries(ROUTES).map(([k, v]) => `<button class="${k === ui.org ? "on" : ""}" data-act="org" data-k="${k}">${v.name}</button>`).join("")}</div>
+    <p>${r.start} Ťukaj na zastávky v správnom poradí. Farba bodky ukazuje, akú krv kvapka práve nesie.</p>
+    <ol class="path">
+      ${r.steps.map((s, i) => i < ui.pos
+        ? `<li><span class="n">${i + 1}.</span><span class="d" style="background:var(--${s[1]})"></span><span>${s[0]}</span></li>`
+        : i === ui.pos && !done ? `<li class="slot"><span class="n">${i + 1}.</span><span class="d"></span><span class="txt">kam ďalej?</span></li>` : "").join("")}
+    </ol>
+    ${done ? `<div class="feedback good">${verdict(true, "Kvapka je späť na začiatku!", "")}${ui.err ? `Chyby: ${ui.err}. Skús to ešte raz bez chyby.` : "Bez jedinej chyby."}</div>
+      <div class="row"><button class="btn" data-act="again">Ešte raz</button>${Object.keys(ROUTES).filter(k => k !== ui.org).map(k => `<button class="btn ghost" data-act="org" data-k="${k}">${ROUTES[k].name}</button>`).join("")}</div>`
+    : `${ui.hint ? `<p class="hint">${ui.hint}</p>` : ""}
+      <div class="pool">${ui.pool.filter(t => !t.used).map(t => `<button class="tile" data-act="tile" data-id="${t.id}">${t.t}</button>`).join("")}</div>
+      <p class="small muted">Dve zastávky do tohto obehu nepatria.</p>`}
   </div>`;
 }
 
@@ -869,25 +1060,26 @@ function sortView() {
   if (ui.view !== "sort") ui = { view: "sort", list: shuffle(ANIMALS).slice(0, 12), i: 0, right: 0, pick: null };
   const total = ui.list.length;
   if (ui.i >= total) {
-    app.innerHTML = `<div class="card"><span class="eyebrow">Kam patrí? · výsledok</span>
-      <div class="score">${ui.right}<span class="muted" style="font-size:.4em"> / ${total}</span></div>
-      <p class="muted">${ui.right === total ? "Bez chyby, aj s výnimkami." : "Pozri si zastávky, kde si sa pomýlil(a), a skús znova."}</p>
-      <div class="row"><button class="btn" data-act="sortagain">Nové kolo</button><a class="btn ghost" href="#">Mapa</a></div></div>`;
+    app.innerHTML = `<div class="stack"><h2>Kam patrí? Výsledok</h2>
+      <p class="animal">${ui.right} / ${total}</p>
+      <p class="muted">${ui.right === total ? "Bez chyby, aj s výnimkami." : "Pozri si zastávky, kde si sa pomýlil, a skús nové kolo."}</p>
+      <div class="row"><button class="btn" data-act="sortagain">Nové kolo</button><a class="btn ghost" href="#">Obsah</a></div></div>`;
     return;
   }
   const [name, cat, why] = ui.list[ui.i];
   const ok = ui.pick === cat;
+  const opt = (c, k) => {
+    let cls = ""; if (ui.pick != null) cls = k === cat ? "right" : (k === ui.pick ? "wrong" : "dim");
+    const mark = ui.pick != null && k === cat ? `<span class="mark" aria-hidden="true">✓</span>` : "";
+    return `<button class="opt ${cls}" data-act="cat" data-k="${k}" ${ui.pick != null ? "disabled" : ""}>${mark}<span class="k">${k + 1}${k === ui.pick ? ring() : ""}</span><span class="txt">${c}</span></button>`;
+  };
   app.innerHTML = `<div class="stack">
-    <span class="eyebrow">Hra · Kam patrí? · ${ui.i + 1} / ${total}</span>
-    <div class="card">
-      <span class="muted">Aký typ obehovej sústavy alebo srdca má</span>
-      <div class="animal">${name}</div>
-      <div class="cats">${SORT_CATS.map((c, k) => {
-        let cls = ""; if (ui.pick != null) cls = k === cat ? "right" : (k === ui.pick ? "wrong" : "dim");
-        return `<button class="opt ${cls}" data-act="cat" data-k="${k}" ${ui.pick != null ? "disabled" : ""}><span class="k">${k + 1}</span><span>${c}</span></button>`; }).join("")}</div>
-      ${ui.pick != null ? `<div class="feedback ${ok ? "good" : "miss"}"><strong>${ok ? "Správne." : "Patrí do: " + SORT_CATS[cat]}</strong>${why}</div>` : ""}
-    </div>
-    <div class="navbar"><a class="btn ghost" href="#">Mapa</a><button class="btn" data-act="sortnext" ${ui.pick == null ? "disabled" : ""}>Ďalej</button></div>
+    <p class="method">metóda: <b>striedanie tém</b> · Živočíchy idú náhodne, aby si skupiny musel naozaj rozlišovať. ${ui.i + 1} / ${total}</p>
+    <p class="muted">Aký typ obehovej sústavy alebo srdca má</p>
+    <p class="animal">${name}</p>
+    <div class="cats"><div class="opts">${SORT_CATS.slice(0, 3).map((c, k) => opt(c, k)).join("")}</div><div class="opts">${SORT_CATS.slice(3).map((c, k) => opt(c, k + 3)).join("")}</div></div>
+    ${ui.pick != null ? `<div class="feedback ${ok ? "good" : ""}">${verdict(ok, "Správne!", "Patrí do: " + SORT_CATS[cat])}${why}</div>` : ""}
+    <div class="navbar"><a class="btn ghost" href="#">Obsah</a><button class="btn" data-act="sortnext" ${ui.pick == null ? "disabled" : ""}>Ďalej →</button></div>
   </div>`;
 }
 
@@ -895,34 +1087,33 @@ function sortView() {
 function cardsView() {
   if (ui.view !== "cards") {
     const order = shuffle(CARDS.map((_, i) => i)).sort((a, b) => (S.boxes[a] || 0) - (S.boxes[b] || 0)).slice(0, 12);
-    ui = { view: "cards", queue: order, flipped: false, seen: 0 };
+    ui = { view: "cards", queue: order, flipped: false };
   }
   const counts = [0, 1, 2, 3].map(b => CARDS.filter((_, i) => Math.min(S.boxes[i] || 0, 3) === b).length);
-  const head = `<span class="eyebrow">Kartičky · opakovanie s rozostupmi</span>
-    <div><div class="boxes">${counts.map((c, b) => `<div class="${b === 3 ? "lit" : ""}" style="height:${4 + (c / CARDS.length) * 40}px" title="${c}"></div>`).join("")}</div>
-    <div class="boxlbl"><span>nové ${counts[0]}</span><span>1× ${counts[1]}</span><span>2× ${counts[2]}</span><span>vieš ${counts[3]}</span></div></div>`;
+  const head = `<p class="method">metóda: <b>opakovanie s odstupom</b> · Kartička, ktorú vieš, sa posunie o priečinok ďalej a ukáže sa zriedkavejšie. Kartička, ktorú nevieš, sa vráti o chvíľu.</p>
+    <h2>Kartičky</h2>
+    <div class="boxes">${["nové", "1× vedel", "2× vedel", "vieš"].map((l, b) => `<div><b>${counts[b]}</b>${l}</div>`).join("")}</div>`;
   if (!ui.queue.length) {
-    app.innerHTML = `<div class="stack">${head}<div class="card"><h2>Kolo hotové</h2><p class="muted">Kartičky, ktoré si vedel(a), sa posunuli ďalej a ukážu sa zriedkavejšie. Najlepšie je vrátiť sa zajtra.</p>
-      <div class="row"><button class="btn" data-act="cardsagain">Ďalšie kolo</button><a class="btn ghost" href="#">Mapa</a></div></div></div>`;
+    app.innerHTML = `<div class="stack">${head}<h3>Kolo hotové</h3><p>Najviac ti pomôže, keď sa vrátiš zajtra a potom o pár dní. Krátko a často je lepšie ako dlho naraz.</p>
+      <div class="row"><button class="btn" data-act="cardsagain">Ďalšie kolo</button><a class="btn ghost" href="#">Obsah</a></div></div>`;
     return;
   }
   const i = ui.queue[0], [q, a] = CARDS[i];
   app.innerHTML = `<div class="stack">${head}
-    <button class="card flash" data-act="flip" aria-label="Otočiť kartičku">
-      <span class="mono">${ui.flipped ? "odpoveď" : "otázka · ťukni pre odpoveď"}</span>
-      <span class="q">${q}</span>
-      ${ui.flipped ? `<span class="a">${a}</span>` : ""}
+    <button class="flash" data-act="flip" aria-label="Otočiť kartičku">
+      <span class="side">${ui.flipped ? "odpoveď" : "otázka č. " + (i + 1)}</span>
+      <span class="fq">${q}</span>
+      ${ui.flipped ? `<span class="fa">${a}</span>` : ""}
     </button>
-    ${ui.flipped ? `<div class="row" style="justify-content:space-between"><button class="btn ghost" style="flex:1" data-act="no">Ešte neviem</button><button class="btn" style="flex:1" data-act="yes">Viem</button></div>`
-                 : `<p class="muted" style="text-align:center">Najprv si odpoveď povedz sám/sama, až potom otoč.</p>`}
+    ${ui.flipped ? `<div class="row"><button class="btn ghost" style="flex:1" data-act="no">Ešte neviem</button><button class="btn" style="flex:1" data-act="yes">Vedel som</button></div>`
+                 : `<p class="muted">Odpovedz nahlas alebo v duchu. Až potom otoč kartičku.</p>`}
     <p class="kbd">medzerník = otočiť · ← neviem · → viem</p>
   </div>`;
 }
 
-/* ---------- Skúška ---------- */
-function testBank() {
-  return [...STATIONS.flatMap(s => s.checks.map(c => ({ ...c, s: s.id }))), ...EXTRA_TEST];
-}
+/* ---------- Písomka ---------- */
+function testBank() { return [...STATIONS.flatMap(s => s.checks.map(c => ({ ...c, s: s.id }))), ...EXTRA_TEST]; }
+const gradeOf = (r) => r >= 11 ? 1 : r >= 9 ? 2 : r >= 7 ? 3 : r >= 5 ? 4 : 5;
 function testView() {
   if (ui.view !== "test") {
     const qs = shuffle(testBank()).slice(0, 12).map(q => ({ ...q, opts: shuffle(q.o.map((t, i) => ({ t, i }))) }));
@@ -935,24 +1126,25 @@ function testView() {
     const missed = ui.qs.map((q, k) => ({ q, k })).filter(({ q, k }) => q.opts[ui.ans[k]].i !== q.a);
     const toReview = [...new Set(missed.map(m => m.q.s))].sort((a, b) => a - b);
     app.innerHTML = `<div class="stack">
-      <span class="eyebrow">Skúška · výsledok</span>
-      <div class="score">${right}<span class="muted" style="font-size:.4em"> / ${total}</span></div>
-      <p class="muted">${right >= 11 ? "Výborné. Toto učivo máš v hlave." : right >= 8 ? "Dobré. Zopakuj si zastávky nižšie a skús to znova." : "Ešte to chce opakovanie. Prejdi si zastávky nižšie."}</p>
+      <h2>Písomka</h2>
+      <div class="grade"><div class="mk"><svg viewBox="0 0 104 104" aria-hidden="true"><path d="M78 16 C60 2 20 6 10 40 C0 76 34 100 64 94 C96 86 104 50 86 26 C80 18 70 12 58 11"/></svg>${gradeOf(right)}</div>
+        <div><p class="pts">${right} / ${total} bodov</p><p class="muted">${right >= 11 ? "Výborne. Toto učivo máš v hlave." : right >= 7 ? "Dobre. Zopakuj si zastávky nižšie a skús to znova." : "Ešte to chce opakovanie. Prejdi si zastávky nižšie."}</p></div></div>
       ${toReview.length ? `<div class="row">${toReview.map(id => `<a class="btn ghost" href="#stanica-${id}">Zopakovať: ${STATIONS[id - 1].short}</a>`).join("")}</div>` : ""}
-      ${missed.length ? `<h3 style="margin-top:12px">Na tieto si daj pozor</h3><ul class="miss-list">${missed.map(({ q }) => `<li><b>${q.q}</b><br>Správne: ${q.o[q.a]}. <span class="muted">${q.e}</span></li>`).join("")}</ul>` : ""}
-      <div class="row"><button class="btn" data-act="testagain">Nová skúška</button><a class="btn ghost" href="#">Mapa</a></div>
+      ${missed.length ? `<h3>Oprava chýb</h3><ul class="miss-list">${missed.map(({ q }) => `<li><b>${q.q}</b><br><span class="fix">správne: ${q.o[q.a]}</span><br><span class="muted">${q.e}</span></li>`).join("")}</ul>` : ""}
+      <div class="row"><button class="btn" data-act="testagain">Nová písomka</button><a class="btn ghost" href="#">Obsah</a></div>
     </div>`;
     return;
   }
   const q = ui.qs[ui.i], ch = ui.ans[ui.i];
-  const correct = ch != null && q.opts[ch].i === q.a;
+  const ok = ch != null && q.opts[ch].i === q.a;
   app.innerHTML = `<div class="stack">
-    <div class="bar" aria-hidden="true">${ui.qs.map((_, k) => `<i class="${k <= ui.i ? "on" : ""}"></i>`).join("")}</div>
-    <div class="card"><span class="eyebrow">Skúška · ${ui.i + 1} / ${total} · ${STATIONS[q.s - 1].short}</span><h2>${q.q}</h2>
-      ${optsHtml(q.opts, ch, q.a, "test")}
-      ${ch != null ? `<div class="feedback ${correct ? "good" : "miss"}"><strong>${correct ? "Správne." : "Nie celkom."}</strong>${q.e}</div>` : ""}</div>
-    <div class="navbar"><a class="btn ghost" href="#">Mapa</a><button class="btn" data-act="testnext" ${ch == null ? "disabled" : ""}>${ui.i === total - 1 ? "Výsledok" : "Ďalej"}</button></div>
-    <p class="kbd">klávesy A B C · Enter = ďalej</p>
+    <div class="pagehead"><a href="#">← Obsah</a><span class="pageno">otázka ${ui.i + 1} / ${total}</span></div>
+    <p class="method">metóda: <b>vybavovanie + striedanie</b> · Otázky zo všetkých zastávok namiešané.</p>
+    <p class="kicker">${STATIONS[q.s - 1].short}</p><p class="q">${q.q}</p>
+    ${optsHtml(q.opts, ch, q.a, "test")}
+    ${ch != null ? `<div class="feedback ${ok ? "good" : ""}">${verdict(ok, "Správne!", "Nie celkom.")}${q.e}</div>` : ""}
+    <div class="navbar"><a class="btn ghost" href="#">Obsah</a><button class="btn" data-act="testnext" ${ch == null ? "disabled" : ""}>${ui.i === total - 1 ? "Známka →" : "Ďalej →"}</button></div>
+    <p class="kbd">klávesy a, b, c · Enter = ďalej</p>
   </div>`;
 }
 
@@ -971,36 +1163,30 @@ function sheetView() {
     ["Cicavce", "uzavretá", "4 oddiely", "2", "oddelená", "ľavý oblúk aorty; krvinky bez jadra"]
   ];
   app.innerHTML = `<div class="stack">
-    <span class="eyebrow">Ťahák</span>
-    <h2>Celá cesta na jednej strane</h2>
+    <h2>Ťahák</h2>
     <div class="mnemo">
-      <div><b>2</b><span>ryba<br>1 obeh</span></div>
-      <div><b>3</b><span>žaba<br>krv sa mieša</span></div>
-      <div><b>3½</b><span>plaz<br>neúplná priehradka</span></div>
-      <div><b>4</b><span>vták, cicavec<br>(a krokodíl)</span></div>
+      <div><b>2</b><span>ryba, 1 obeh</span></div>
+      <div><b>3</b><span>žaba, krv sa mieša</span></div>
+      <div><b>3½</b><span>plaz, neúplná priehradka</span></div>
+      <div><b>4</b><span>vták, cicavec (a krokodíl)</span></div>
     </div>
-    <p class="muted">Pomôcka „2 – 3 – 3½ – 4“: počet oddielov srdca stavovcov. Polovica znamená neúplnú priehradku.</p>
+    <p class="hand">Pomôcka „2 – 3 – 3½ – 4“ = počet oddielov srdca stavovcov. Polovica znamená neúplnú priehradku.</p>
+    <p class="tabcap"><b>Tab. 1</b> Vývoj obehovej sústavy živočíchov</p>
     <div class="tablewrap"><table>
       <thead><tr><th>Skupina</th><th>Sústava</th><th>Srdce</th><th>Obehy</th><th>Krv v srdci</th><th>Zapamätaj si</th></tr></thead>
       <tbody>${rows.map(r => `<tr>${r.map(c => `<td>${c}</td>`).join("")}</tr>`).join("")}</tbody>
     </table></div>
-    <div class="rule stack" style="gap:8px">
-      <h3>Tepna verzus žila</h3>
+    <div class="rule"><h3>Tepna verzus žila</h3>
       <p><b>Tepna</b> vedie krv <b>zo</b> srdca, <b>žila</b> <b>do</b> srdca. O kyslíku to nehovorí nič.</p>
-      <p class="muted">Pľúcnica je tepna s odkysličenou krvou, pľúcne žily vedú okysličenú krv.</p>
-    </div>
-    <div class="rule stack" style="gap:8px">
-      <h3>Dva obehy človeka</h3>
+      <p class="muted">Pľúcnica je tepna s odkysličenou krvou, pľúcne žily vedú okysličenú krv.</p></div>
+    <div class="rule"><h3>Dva obehy človeka</h3>
       <p><b>Malý:</b> pravá komora → pľúcnica → pľúca → pľúcne žily → ľavá predsieň.</p>
       <p><b>Veľký:</b> ľavá komora → aorta → telo → duté žily → pravá predsieň.</p>
-      <p class="muted">Obeh začína v komore a končí v predsieni.</p>
-    </div>
-    <div class="rule stack" style="gap:8px">
-      <h3>Smer krvi: kto má čo naopak</h3>
+      <p class="muted">Obeh začína v komore a končí v predsieni.</p></div>
+    <div class="rule"><h3>Smer krvi: kto má čo naopak</h3>
       <p><b>Dážďovka:</b> chrbtom dopredu, bruchom dozadu.</p>
-      <p><b>Kopijovec a stavovce:</b> bruchom dopredu (tam je srdce), chrbtom dozadu (aorta).</p>
-    </div>
-    <a class="btn ghost" href="#">Späť na mapu</a>
+      <p><b>Kopijovec a stavovce:</b> bruchom dopredu (tam je srdce), chrbtom dozadu (aorta).</p></div>
+    <a class="btn ghost" href="#">← Obsah</a>
   </div>`;
 }
 
@@ -1025,21 +1211,33 @@ function act(a, el) {
   const id = +(location.hash.match(/stanica-(\d+)/) || [])[1];
   const st = STATIONS.find(s => s.id === id);
   switch (a) {
+    case "warm": if (ui.warmAns == null) { ui.warmAns = +el.dataset.i; rerender(); } break;
     case "pred": if (ui.pred == null) { ui.pred = +el.dataset.i; rerender(); } break;
     case "chk": { const k = +stationSteps(st)[ui.step].slice(5); if (ui.chk[k] == null) { ui.chk[k] = +el.dataset.i; rerender(); } break; }
     case "reveal": ui.shown = true; rerender(); break;
     case "next": ui.step++; render(); window.scrollTo(0, 0); break;
     case "prev": ui.step = Math.max(0, ui.step - 1); render(); window.scrollTo(0, 0); break;
+    case "pen": ui.pen = el.dataset.k; rerender(); break;
+    case "paint": {
+      const P = ui.paint; if (P.solved) break;
+      const part = el.dataset.part, kind = part.slice(0, 2), i = +part.slice(2);
+      P[kind][i] = P[kind][i] === ui.pen ? null : ui.pen; rerender(); break;
+    }
+    case "checkpaint": case "recheck": ui.paint.checked = true; ui.paint.solved = false; rerender(); break;
+    case "solve": ui.paint.solved = !ui.paint.solved; rerender(); break;
+    case "word": { const g = ui.fill.indexOf(null); if (g >= 0) { ui.fill[g] = ui.cz.bank[+el.dataset.w]; rerender(); } break; }
+    case "ungap": ui.fill[+el.dataset.g] = null; rerender(); break;
+    case "checkcloze": ui.czChecked = true; rerender(); break;
+    case "checkteach": ui.teachChecked = true; rerender(); break;
     case "org": ui.org = el.dataset.k; ui.pool = null; render(); break;
     case "again": ui.pool = null; render(); break;
     case "tile": {
       const r = ROUTES[ui.org], t = ui.pool.find(x => x.id === el.dataset.id), exp = r.steps[ui.pos];
-      if (t.t === exp[0]) {
-        t.used = true; ui.pos++; ui.hint = null; rerender();
-      } else {
+      if (t.t === exp[0]) { t.used = true; ui.pos++; ui.hint = null; rerender(); }
+      else {
         ui.err++; el.classList.remove("shake"); void el.offsetWidth; el.classList.add("shake");
         const prev = ui.pos ? r.steps[ui.pos - 1][0] : null;
-        ui.hint = `<b>${t.t}</b> teraz nie. ${prev ? "Kvapka je v časti <b>" + prev + "</b>. " : ""}${exp[2]}`;
+        ui.hint = `${t.t}? Teraz nie. ${prev ? "Kvapka je v časti <b>" + prev + "</b>. " : ""}${exp[2]}`;
         const hintEl = app.querySelector(".hint");
         if (hintEl) hintEl.innerHTML = ui.hint; else setTimeout(rerender, 360);
       }
@@ -1065,18 +1263,20 @@ app.addEventListener("click", (e) => {
   const el = e.target.closest("[data-act]");
   if (el && !el.disabled) act(el.dataset.act, el);
 });
+app.addEventListener("input", (e) => { if (e.target.dataset.input === "teach") ui.teach = e.target.value; });
 document.addEventListener("keydown", (e) => {
   if (e.metaKey || e.ctrlKey || e.altKey) return;
+  const tag = document.activeElement?.tagName;
+  if (tag === "TEXTAREA" || tag === "INPUT") return;
   const k = e.key.toLowerCase();
   const idx = { a: 0, b: 1, c: 2, "1": 0, "2": 1, "3": 2, "4": 3, "5": 4, "6": 5 }[k];
-  if (idx != null) {
+  if (idx != null && ui.view !== "cards") {
     const opts = app.querySelectorAll(".opt:not([disabled])");
     if (opts[idx]) { opts[idx].click(); e.preventDefault(); }
     return;
   }
   if (k === "enter") {
-    const n = app.querySelector('[data-act="next"]:not([disabled]), [data-act="testnext"]:not([disabled]), [data-act="sortnext"]:not([disabled])');
-    const tag = document.activeElement?.tagName;
+    const n = app.querySelector('[data-act="next"].btn:not([disabled]):last-child, [data-act="testnext"]:not([disabled]), [data-act="sortnext"]:not([disabled])');
     if (n && tag !== "A" && tag !== "BUTTON") { n.click(); e.preventDefault(); }
   }
   if (ui.view === "cards") {
