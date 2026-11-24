@@ -3,6 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Cpath d=%22M16 28C5 19 2 13 5 8.5 8 4 13 5 16 9c3-4 8-5 11-.5 3 4.5 0 10.5-11 19.5z%22 fill=%22%23D3263F%22/%3E%3C/svg%3E">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Srdce v čase">
+<meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
 <title>Srdce v čase</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="description" content="Interaktívna cesta vývojom obehovej sústavy živočíchov – od difúzie po štvordielne srdce.">
@@ -654,9 +661,24 @@ const ROUTES = {
    STAV
    ========================================================= */
 const KEY = "srdce-v-case-v1";
-function load() { try { return Object.assign({ done: {}, boxes: {}, best: null }, JSON.parse(localStorage.getItem(KEY) || "{}")); } catch (e) { return { done: {}, boxes: {}, best: null }; } }
-function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+/* Postup sa ukladá v prehliadači (localStorage) bez dátumu exspirácie.
+   Safari maže dáta webu, ktorý človek 7 dní neotvoril. Preto: žiadosť o trvalé úložisko,
+   možnosť pridať appku na plochu (tam sa to pravidlo neuplatňuje) a záloha postupu ako kód. */
+const EMPTY = () => ({ done: {}, boxes: {}, best: null, savedAt: null });
+function load() { try { return Object.assign(EMPTY(), JSON.parse(localStorage.getItem(KEY) || "{}")); } catch (e) { return EMPTY(); } }
+let persistAsked = false;
+function save() {
+  S.savedAt = new Date().toISOString();
+  try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {}
+  if (!persistAsked && navigator.storage && navigator.storage.persist) { persistAsked = true; navigator.storage.persist().catch(() => {}); }
+}
 const S = load();
+function backupCode() { return btoa(unescape(encodeURIComponent(JSON.stringify({ v: 1, done: S.done, boxes: S.boxes, best: S.best })))); }
+function restoreCode(code) {
+  const d = JSON.parse(decodeURIComponent(escape(atob(code.trim()))));
+  if (!d || d.v !== 1 || typeof d.done !== "object" || typeof d.boxes !== "object") throw new Error("bad");
+  S.done = d.done; S.boxes = d.boxes; S.best = typeof d.best === "number" ? d.best : null; save();
+}
 let ui = {};
 const app = document.getElementById("app");
 
@@ -877,6 +899,17 @@ function homeView() {
       <dt>Vysvetľovanie</dt><dd>Napíšeš to vlastnými slovami spolužiakovi.</dd>
     </dl>
     <p class="meta">Podľa prehľadov Dunlosky a kol. (2013) a Weinstein a kol. (2018).</p>
+  </details>
+  <details class="why-methods" id="backup" ${ui.backupOpen ? "open" : ""}>
+    <summary>Uložený postup</summary>
+    <div class="stack" style="gap:14px;padding-bottom:18px">
+      <p class="meta">Postup sa ukladá v tomto prehliadači${S.savedAt ? ", naposledy " + new Date(S.savedAt).toLocaleDateString("sk-SK") : ""}. Ak sa učíš na iPhone v Safari, pridaj si appku na plochu (Zdieľať → Pridať na plochu). Safari inak maže dáta webov, ktoré 7 dní neotvoríš.</p>
+      <p class="meta">Pre istotu si skopíruj kód postupu. Vložíš ho tu neskôr alebo na inom zariadení.</p>
+      <div class="row"><button class="btn ghost" data-act="copycode">Skopírovať kód postupu</button></div>
+      <textarea id="backup-code" data-input="code" placeholder="Sem vlož kód postupu" style="min-height:90px">${ui.code || ""}</textarea>
+      <div class="row"><button class="btn ghost" data-act="restore">Obnoviť postup z kódu</button></div>
+      ${ui.backupMsg ? `<p class="meta" role="status"><b>${ui.backupMsg}</b></p>` : ""}
+    </div>
   </details>`;
 }
 
@@ -1193,7 +1226,7 @@ function render() {
   else if (h === "karticky") cardsView();
   else if (h === "test") testView();
   else if (h === "tahak") sheetView();
-  else { ui = { view: "home" }; homeView(); }
+  else { if (ui.view !== "home") ui = { view: "home" }; homeView(); }
 }
 function rerender() { const y = window.scrollY; render(); window.scrollTo(0, y); }
 window.addEventListener("hashchange", () => { ui.view = null; render(); window.scrollTo(0, 0); });
@@ -1248,13 +1281,23 @@ function act(a, el) {
     case "test": if (ui.ans[ui.i] == null) { ui.ans[ui.i] = +el.dataset.i; rerender(); } break;
     case "testnext": ui.i++; render(); window.scrollTo(0, 0); break;
     case "testagain": ui.view = null; render(); break;
+    case "copycode": {
+      const code = backupCode(); ui.code = code; ui.backupOpen = true;
+      const done = (ok) => { ui.backupMsg = ok ? "Kód je skopírovaný. Ulož si ho napríklad do poznámok." : "Kód je v poli nižšie. Označ ho a skopíruj."; rerender(); if (!ok) { const t = document.getElementById("backup-code"); t && t.select(); } };
+      try { navigator.clipboard.writeText(code).then(() => done(true), () => done(false)); } catch (err) { done(false); }
+      break;
+    }
+    case "restore":
+      ui.backupOpen = true;
+      try { restoreCode(ui.code || ""); ui.backupMsg = "Postup je obnovený."; } catch (err) { ui.backupMsg = "Tento kód nefunguje. Skopíruj ho celý, bez medzier navyše."; }
+      rerender(); break;
   }
 }
 app.addEventListener("click", (e) => {
   const el = e.target.closest("[data-act]");
   if (el && !el.disabled) act(el.dataset.act, el);
 });
-app.addEventListener("input", (e) => { if (e.target.dataset.input === "teach") ui.teach = e.target.value; });
+app.addEventListener("input", (e) => { if (e.target.dataset.input === "teach") ui.teach = e.target.value; if (e.target.dataset.input === "code") ui.code = e.target.value; });
 document.addEventListener("keydown", (e) => {
   if (e.metaKey || e.ctrlKey || e.altKey) return;
   const tag = document.activeElement?.tagName;
