@@ -1,0 +1,1091 @@
+<!doctype html>
+<html lang="sk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Srdce v čase</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Interaktívna cesta vývojom obehovej sústavy živočíchov – od difúzie po štvordielne srdce.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: jeden úzky stĺpec ako učebnica vo vrecku; mapa = časová os, stanica = krokovaný výklad so schémou zapojenia ako elektrický obvod. */
+:root {
+  --paper: #F3F5F6;
+  --surface: #FFFFFF;
+  --ink: #14202A;
+  --muted: #5A6872;
+  --line: #D9E0E4;
+  --oxy: #C61F3A;     /* okysličená krv */
+  --deoxy: #2A57C4;   /* odkysličená krv */
+  --mix: #7C47AE;     /* zmiešaná krv */
+  --hemo: #A87D12;    /* hemolymfa */
+  --pale: #8B979F;    /* bezfarebná krv */
+  --ok: #1D8457;
+  --bad: #C2410C;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --r: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0E151B; --surface: #151F27; --ink: #E5ECEF; --muted: #93A2AC; --line: #26333D;
+    --oxy: #FF5C70; --deoxy: #6F97FF; --mix: #B98CE8; --hemo: #E2B64B; --pale: #8D9BA5;
+    --ok: #4CC58C; --bad: #F2904F; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0E151B; --surface: #151F27; --ink: #E5ECEF; --muted: #93A2AC; --line: #26333D;
+  --oxy: #FF5C70; --deoxy: #6F97FF; --mix: #B98CE8; --hemo: #E2B64B; --pale: #8D9BA5;
+  --ok: #4CC58C; --bad: #F2904F; color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  background: var(--paper); color: var(--ink);
+  font-family: var(--f-body); font-size: 17px; line-height: 1.55;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.wrap { max-width: 720px; margin: 0 auto; padding-block: 20px 48px; }
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.12; margin: 0; text-wrap: balance; letter-spacing: -0.01em; }
+h1 { font-size: clamp(2.2rem, 7vw, 3.4rem); font-weight: 800; }
+h2 { font-size: clamp(1.6rem, 5vw, 2.1rem); font-weight: 700; }
+h3 { font-size: 1.15rem; font-weight: 700; }
+p { margin: 0; }
+b, strong { font-weight: 700; }
+a { color: inherit; }
+.mono, .eyebrow { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.muted { color: var(--muted); }
+.stack { display: flex; flex-direction: column; gap: 16px; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+:focus-visible { outline: 3px solid var(--deoxy); outline-offset: 2px; border-radius: 6px; }
+
+/* Top bar */
+.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-bottom: 20px; }
+.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; font-family: var(--f-display); font-weight: 700; font-size: 1.05rem; }
+.brand svg { width: 26px; height: 26px; }
+.toplinks { display: flex; gap: 6px; }
+.toplink { font-family: var(--f-mono); font-size: 0.74rem; letter-spacing: .05em; text-transform: uppercase; text-decoration: none; padding: 7px 10px; border-radius: 8px; color: var(--muted); }
+.toplink:hover { background: var(--surface); color: var(--ink); }
+
+/* Buttons */
+button { font: inherit; color: inherit; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 20px; border-radius: 999px; border: 1.5px solid var(--ink); background: var(--ink); color: var(--paper); font-weight: 700; cursor: pointer; text-decoration: none; transition: transform .12s ease; }
+.btn:active { transform: scale(.98); }
+.btn.ghost { background: transparent; color: var(--ink); border-color: var(--line); }
+.btn.ghost:hover { border-color: var(--ink); }
+.btn[disabled] { opacity: .35; cursor: not-allowed; }
+.btn.wide { width: 100%; }
+
+/* Home */
+.hero { display: grid; gap: 18px; padding-block: 8px 28px; }
+.hero h1 .beat { color: var(--oxy); }
+.lede { font-size: 1.1rem; color: var(--muted); max-width: 34em; }
+.progress-line { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.pips { display: flex; gap: 5px; }
+.pip { width: 22px; height: 6px; border-radius: 3px; background: var(--line); }
+.pip.on { background: var(--oxy); }
+
+.section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 36px 0 14px; }
+.note { font-size: 0.92rem; color: var(--muted); border-left: 2px solid var(--line); padding-left: 12px; max-width: 40em; }
+
+.timeline { list-style: none; margin: 0; padding: 0; position: relative; }
+.timeline::before { content: ""; position: absolute; left: 92px; top: 18px; bottom: 18px; width: 2px; background: var(--line); }
+.stop a { display: grid; grid-template-columns: 76px 34px 1fr auto; align-items: center; gap: 0 10px; padding: 12px 10px 12px 0; text-decoration: none; border-radius: var(--r); }
+.stop a:hover { background: var(--surface); }
+.stop .era { font-family: var(--f-mono); font-size: 0.72rem; color: var(--muted); text-align: right; line-height: 1.3; }
+.stop .node { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--line); background: var(--paper); justify-self: center; position: relative; z-index: 1; }
+.stop.done .node { background: var(--oxy); border-color: var(--oxy); }
+.stop.next .node { border-color: var(--oxy); box-shadow: 0 0 0 5px color-mix(in srgb, var(--oxy) 18%, transparent); }
+.stop .name { min-width: 0; }
+.stop .name strong { display: block; font-family: var(--f-display); font-size: 1.08rem; }
+.stop .name span { font-size: 0.9rem; color: var(--muted); }
+.chip { font-family: var(--f-mono); font-size: 0.7rem; letter-spacing: .03em; padding: 4px 8px; border-radius: 6px; border: 1px solid var(--line); white-space: nowrap; color: var(--muted); }
+
+.modes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.mode { display: flex; flex-direction: column; gap: 6px; padding: 18px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); text-decoration: none; min-width: 0; }
+.mode:hover { border-color: var(--ink); }
+.mode h3 { display: flex; justify-content: space-between; gap: 8px; }
+.mode p { font-size: 0.92rem; color: var(--muted); }
+.mode .meta { margin-top: auto; padding-top: 8px; }
+@media (max-width: 520px) {
+  .modes { grid-template-columns: 1fr; }
+  .stop a { grid-template-columns: 58px 26px 1fr; }
+  .stop .chip { grid-column: 3; justify-self: start; margin-top: 4px; }
+  .timeline::before { left: 70px; }
+}
+
+/* Station */
+.bar { display: flex; gap: 4px; margin: 4px 0 22px; }
+.bar i { flex: 1; height: 4px; border-radius: 2px; background: var(--line); }
+.bar i.on { background: var(--ink); }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: clamp(18px, 4vw, 28px); display: flex; flex-direction: column; gap: 18px; }
+.card .lead { font-size: 1.08rem; }
+.predict { border-top: 1px dashed var(--line); padding-top: 18px; display: flex; flex-direction: column; gap: 12px; }
+.opts { display: flex; flex-direction: column; gap: 10px; }
+.opt { text-align: left; display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; border-radius: var(--r); border: 1.5px solid var(--line); background: var(--paper); cursor: pointer; line-height: 1.4; }
+.opt:hover:not([disabled]) { border-color: var(--ink); }
+.opt .k { font-family: var(--f-mono); font-size: .75rem; color: var(--muted); padding-top: 3px; min-width: 1em; }
+.opt[disabled] { cursor: default; }
+.opt.right { border-color: var(--ok); background: color-mix(in srgb, var(--ok) 10%, var(--surface)); }
+.opt.wrong { border-color: var(--bad); background: color-mix(in srgb, var(--bad) 8%, var(--surface)); }
+.opt.dim { opacity: .55; }
+.feedback { padding: 14px 16px; border-radius: var(--r); background: var(--paper); font-size: .97rem; }
+.feedback strong { display: block; font-family: var(--f-display); margin-bottom: 2px; }
+.feedback.good strong { color: var(--ok); }
+.feedback.miss strong { color: var(--bad); }
+.points { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 14px; }
+.points li { display: grid; grid-template-columns: 22px 1fr; gap: 8px; }
+.points li::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--oxy); margin-top: 9px; }
+.diagram { width: 100%; overflow-x: auto; }
+.diagram svg { display: block; width: 100%; max-width: 560px; height: auto; margin: 0 auto; }
+.legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: .85rem; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { width: 18px; height: 4px; border-radius: 2px; display: inline-block; }
+.hidden-answer { border: 1.5px dashed var(--line); border-radius: var(--r); padding: 16px; }
+.remember { font-family: var(--f-display); font-size: clamp(1.4rem, 4.5vw, 1.9rem); font-weight: 700; line-height: 1.2; }
+.navbar { position: sticky; bottom: 0; display: flex; gap: 10px; justify-content: space-between; padding: 14px 0 calc(14px + env(safe-area-inset-bottom, 0px)); background: linear-gradient(to top, var(--paper) 70%, transparent); margin-top: 18px; }
+.navbar .btn { flex: 1; max-width: 220px; }
+.navbar .btn:last-child { margin-left: auto; }
+.kbd { font-family: var(--f-mono); font-size: .7rem; color: var(--muted); text-align: center; margin-top: 6px; }
+@media (hover: none) { .kbd { display: none; } }
+
+/* SVG schemes */
+.sv text { font-family: var(--f-body); fill: var(--ink); font-size: 12px; }
+.sv .lbl { font-family: var(--f-mono); font-size: 9.5px; fill: var(--muted); letter-spacing: .02em; }
+.sv .ttl { font-weight: 700; font-size: 12.5px; }
+.sv .organ { fill: var(--paper); stroke: var(--ink); stroke-width: 1.5; }
+.sv .wall { fill: none; stroke: var(--ink); stroke-width: 1.5; }
+.sv .faint { fill: color-mix(in srgb, var(--ink) 4%, var(--surface)); stroke: var(--line); stroke-width: 1.5; }
+.sv .sept { stroke: var(--ink); stroke-width: 3; stroke-linecap: round; }
+.sv .ch-oxy { fill: color-mix(in srgb, var(--oxy) 16%, var(--surface)); stroke: var(--oxy); stroke-width: 1.5; }
+.sv .ch-deoxy { fill: color-mix(in srgb, var(--deoxy) 16%, var(--surface)); stroke: var(--deoxy); stroke-width: 1.5; }
+.sv .ch-mix { fill: color-mix(in srgb, var(--mix) 18%, var(--surface)); stroke: var(--mix); stroke-width: 1.5; }
+.sv .ch-mixb { fill: color-mix(in srgb, color-mix(in srgb, var(--deoxy) 65%, var(--mix)) 18%, var(--surface)); stroke: color-mix(in srgb, var(--deoxy) 65%, var(--mix)); stroke-width: 1.5; }
+.sv .ch-mixr { fill: color-mix(in srgb, color-mix(in srgb, var(--oxy) 65%, var(--mix)) 18%, var(--surface)); stroke: color-mix(in srgb, var(--oxy) 65%, var(--mix)); stroke-width: 1.5; }
+.sv .ch-hemo { fill: color-mix(in srgb, var(--hemo) 22%, var(--surface)); stroke: var(--hemo); stroke-width: 1.5; }
+.sv .track { fill: none; stroke-width: 4; stroke-linejoin: round; opacity: .28; }
+.sv .flow { fill: none; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1 11; animation: flow 1.1s linear infinite; }
+.sv .s-oxy { stroke: var(--oxy); } .sv .f-oxy { fill: var(--oxy); }
+.sv .s-deoxy { stroke: var(--deoxy); } .sv .f-deoxy { fill: var(--deoxy); }
+.sv .s-mix { stroke: var(--mix); } .sv .f-mix { fill: var(--mix); }
+.sv .s-mixb { stroke: color-mix(in srgb, var(--deoxy) 65%, var(--mix)); } .sv .f-mixb { fill: color-mix(in srgb, var(--deoxy) 65%, var(--mix)); }
+.sv .s-mixr { stroke: color-mix(in srgb, var(--oxy) 65%, var(--mix)); } .sv .f-mixr { fill: color-mix(in srgb, var(--oxy) 65%, var(--mix)); }
+.sv .s-hemo { stroke: var(--hemo); } .sv .f-hemo { fill: var(--hemo); }
+.sv .s-pale { stroke: var(--pale); } .sv .f-pale { fill: var(--pale); }
+.sv .s-ink { stroke: var(--muted); } .sv .f-ink { fill: var(--muted); }
+.sv .pulse { animation: pulse 1.1s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+.sv .dot { animation: drift 2.6s ease-out infinite; }
+@keyframes flow { to { stroke-dashoffset: -24; } }
+@keyframes pulse { 50% { transform: scale(1.12); } }
+@keyframes drift { 0% { transform: translate(0,0); opacity: 0; } 15% { opacity: 1; } 100% { transform: translate(var(--dx), var(--dy)); opacity: 0; } }
+
+/* Games */
+.tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+.tab { padding: 8px 14px; border-radius: 999px; border: 1.5px solid var(--line); background: transparent; cursor: pointer; font-weight: 700; }
+.tab.on { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.path { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0; counter-reset: s; }
+.path li { display: grid; grid-template-columns: 28px 14px 1fr; align-items: center; gap: 10px; padding: 6px 0; position: relative; }
+.path li .n { font-family: var(--f-mono); font-size: .72rem; color: var(--muted); text-align: right; }
+.path li .d { width: 12px; height: 12px; border-radius: 50%; }
+.path li.slot .d { border: 2px dashed var(--line); }
+.path li.slot span:last-child { color: var(--muted); }
+.pool { display: flex; flex-wrap: wrap; gap: 8px; }
+.tile { padding: 10px 14px; border-radius: 10px; border: 1.5px solid var(--line); background: var(--surface); cursor: pointer; font-weight: 700; }
+.tile:hover { border-color: var(--ink); }
+.tile.shake { animation: shake .35s; border-color: var(--bad); }
+@keyframes shake { 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+.hint { font-size: .95rem; padding: 12px 14px; border-radius: var(--r); background: color-mix(in srgb, var(--bad) 8%, var(--surface)); }
+
+.animal { font-family: var(--f-display); font-size: clamp(2rem, 8vw, 2.8rem); font-weight: 800; }
+.cats { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px; }
+.cats .opt { min-width: 0; }
+@media (max-width: 480px) { .cats { grid-template-columns: 1fr; } }
+
+.flash { min-height: 260px; cursor: pointer; justify-content: center; text-align: center; align-items: center; user-select: none; }
+.flash .q { font-family: var(--f-display); font-size: clamp(1.3rem, 4.5vw, 1.7rem); font-weight: 700; line-height: 1.25; max-width: 22em; }
+.flash .a { font-size: 1.08rem; max-width: 30em; }
+.boxes { display: flex; gap: 6px; align-items: flex-end; height: 44px; }
+.boxes div { flex: 1; background: var(--line); border-radius: 4px 4px 0 0; position: relative; min-height: 3px; }
+.boxes div.lit { background: var(--ok); }
+.boxlbl { display: flex; gap: 6px; } .boxlbl span { flex: 1; text-align: center; font-family: var(--f-mono); font-size: .66rem; color: var(--muted); }
+
+.score { font-family: var(--f-display); font-size: clamp(3rem, 12vw, 4.5rem); font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
+.miss-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; }
+.miss-list li { padding: 14px 16px; border-radius: var(--r); background: var(--paper); font-size: .95rem; }
+
+/* Cheat sheet */
+.tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); }
+table { border-collapse: collapse; width: 100%; min-width: 640px; font-size: .9rem; }
+th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-family: var(--f-mono); font-size: .7rem; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+tr:last-child td { border-bottom: 0; }
+td:first-child { font-weight: 700; }
+.mnemo { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 8px; }
+.mnemo div { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 14px 10px; text-align: center; }
+.mnemo b { display: block; font-family: var(--f-display); font-size: 2rem; line-height: 1; }
+.mnemo span { font-size: .85rem; color: var(--muted); }
+@media (max-width: 480px) { .mnemo { grid-template-columns: repeat(2, minmax(0,1fr)); } }
+.rule { padding: 18px; border-radius: var(--r); background: var(--surface); border: 1px solid var(--line); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .sv .flow { stroke-dasharray: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <a class="brand" href="#" aria-label="Srdce v čase – mapa">
+      <svg viewBox="0 0 26 26" aria-hidden="true"><path d="M13 22 C4 15 2 11 4.5 7.5 C7 4 11 5 13 8 C15 5 19 4 21.5 7.5 C24 11 22 15 13 22Z" fill="none" stroke="var(--oxy)" stroke-width="2.2" stroke-linejoin="round"/><path d="M3 14 H8 L10 10 L13 17 L15 13 H23" fill="none" stroke="var(--ink)" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></svg>
+      Srdce v čase
+    </a>
+    <nav class="toplinks">
+      <a class="toplink" href="#karticky">Kartičky</a>
+      <a class="toplink" href="#tahak">Ťahák</a>
+    </nav>
+  </header>
+  <main id="app" aria-live="polite"></main>
+</div>
+
+<script>
+/* =========================================================
+   OBSAH
+   ========================================================= */
+const STATIONS = [
+{
+  id: 1, short: "Bez obehovej sústavy", chip: "difúzia", era: "> 600",
+  group: "Hubky, pŕhlivce, ploskavce", examples: "hubka, nezmar, medúza, planária",
+  lead: "Najjednoduchšie živočíchy obehovú sústavu nepotrebujú. Každá bunka leží blízko vody alebo tráviacej dutiny, takže látky k nej dorazia difúziou.",
+  predict: { q: "Nezmar nemá srdce ani cievy. Ako sa kyslík dostane k jeho bunkám?",
+    o: ["Difúziou z vody a z tráviacej dutiny", "Roznáša ho hemolymfa", "Jeho bunky kyslík nepotrebujú"], a: 0,
+    note: "Stena tela nezmara má len dve vrstvy buniek. Každá bunka je preto pár mikrometrov od vody." },
+  diagram: "diffusion",
+  caption: "Nezmar v reze. Voda s kyslíkom a natrávená potrava sú v gastrovaskulárnej dutine, látky prechádzajú do buniek difúziou.",
+  points: [
+    "<b>Difúzia</b> je samovoľný presun látok z miesta s vyššou koncentráciou na miesto s nižšou. Rýchla je len na vzdialenosť zlomkov milimetra.",
+    "<b>Hubky (pórovce)</b>: voda prúdi pórmi cez telo a bunky si z nej berú kyslík aj potravu priamo.",
+    "<b>Pŕhlivce</b> (nezmar, medúza) majú <b>gastrovaskulárnu dutinu</b>. Jedna dutina slúži na trávenie aj na rozvod živín.",
+    "<b>Ploskavce</b> (planária) majú rozvetvenú tráviacu dutinu, ktorá siaha do celého tela. Ploché telo skracuje vzdialenosti."
+  ],
+  why: { q: "Prečo musia byť tieto živočíchy tenké alebo ploché?",
+    a: "Difúzia stačí len na krátku vzdialenosť. Čím je telo tenšie, tým bližšie je každá bunka k vode alebo k dutine. Hrubšie telo by už potrebovalo transportný systém, teda obehovú sústavu." },
+  checks: [
+    { q: "Čo je gastrovaskulárna dutina?", o: ["Dutina, ktorá slúži na trávenie aj rozvod živín", "Telová dutina, do ktorej sa vylieva hemolymfa", "Hlavná cieva pŕhlivcov"], a: 0,
+      e: "Má ju napríklad nezmar. Jednou dutinou trávi aj rozvádza živiny, cievy nemá." },
+    { q: "Ktorý živočích nemá obehovú sústavu?", o: ["Planária", "Dážďovka", "Včela"], a: 0,
+      e: "Planária je ploskavec a stačí jej difúzia. Dážďovka má uzavretú, včela otvorenú obehovú sústavu." }
+  ],
+  remember: "Malé a ploché telo = stačí difúzia."
+},
+{
+  id: 2, short: "Otvorená sústava", chip: "otvorená", era: "~ 540",
+  group: "Článkonožce a väčšina mäkkýšov", examples: "včela, rak, pavúk, slimák, mušľa",
+  lead: "Krv tu netečie stále v cievach. Srdce ju vypumpuje do telovej dutiny, kde voľne obmýva orgány, a potom sa vracia späť do srdca.",
+  predict: { q: "Krv hmyzu (hemolymfa) kyslík neprenáša. Ako sa potom kyslík dostane k svalom?",
+    o: ["Vzdušnicami priamo k bunkám", "Rozpustený v potrave", "Hemolymfa ho predsa prenáša"], a: 0,
+    note: "Hmyz dýcha vzdušnicami (trachejami), ktoré privádzajú vzduch až k bunkám. Hemolymfa nosí živiny, hormóny a odpadové látky." },
+  diagram: "open",
+  caption: "Hmyz zboku. Srdce je chrbtová cieva s otvormi (ostiami). Hemolymfa vyteká vpredu a pomaly sa telovou dutinou vracia dozadu.",
+  points: [
+    "<b>Hemolymfa</b> je tekutina, ktorá je krvou aj medzibunkovou tekutinou zároveň.",
+    "<b>Hemocél</b> je telová dutina, kam sa hemolymfa vylieva a obmýva orgány. Tečie pomaly a pod nízkym tlakom.",
+    "Srdce hmyzu je <b>chrbtová cieva</b> s pármi otvorov, <b>ostií</b>. Nimi sa hemolymfa nasáva späť. Vpredu cieva pokračuje ako aorta k hlave.",
+    "Kôrovce a mäkkýše majú v krvi <b>hemocyanín</b> s meďou. Okysličená krv je modrastá. Srdce mäkkýšov má komoru a predsiene.",
+    "<b>Výnimka: hlavonožce</b> (sépia, chobotnica) majú uzavretú sústavu a tri srdcia: dve žiabrové a jedno telové."
+  ],
+  why: { q: "Prečo majú hlavonožce uzavretú sústavu, keď ostatné mäkkýše majú otvorenú?",
+    a: "Sú to rýchli dravci. Uzavretá sústava udrží vyšší tlak a rýchlejší prietok krvi, takže svaly dostanú viac kyslíka. Pomalému slimákovi stačí otvorená." },
+  checks: [
+    { q: "Čo sú ostiá?", o: ["Otvory v srdci hmyzu, ktorými sa nasáva hemolymfa", "Žiabrové srdcia hlavonožcov", "Najjemnejšie cievy hmyzu"], a: 0,
+      e: "Ostiá sú párové otvory v chrbtovej cieve. Keď sa srdce uvoľní, hemolymfa cez ne vtečie dnu." },
+    { q: "Ktorý mäkkýš má uzavretú obehovú sústavu?", o: ["Sépia", "Slimák záhradný", "Škľabka"], a: 0,
+      e: "Hlavonožce (sépia, chobotnica, kalmár) majú uzavretú sústavu a tri srdcia. Slimák a škľabka majú otvorenú." }
+  ],
+  remember: "Otvorená = krv mimo ciev, v telovej dutine."
+},
+{
+  id: 3, short: "Uzavretá sústava", chip: "uzavretá", era: "~ 520",
+  group: "Obrúčkavce", examples: "dážďovka, pijavica",
+  lead: "Krv prvýkrát tečie celý čas v cievach. Je to rýchlejšie a dá sa presne riadiť, kam krv pôjde.",
+  predict: { q: "Dážďovka nemá jedno srdce. Čo poháňa jej krv?",
+    o: ["Sťahy chrbtovej cievy a päť párov srdcových ciev", "Iba pohyb tela pri plazení", "Srdce v hlave"], a: 0,
+    note: "Krv ženú sťahy chrbtovej cievy a päť párov pulzujúcich ciev v prednej časti tela, ktoré fungujú ako pomocné srdcia." },
+  diagram: "worm",
+  caption: "Dážďovka, hlava vľavo. Chrbtom krv tečie dopredu, bruchom dozadu, vpredu ich spája päť párov srdcových ciev.",
+  points: [
+    "<b>Uzavretá obehová sústava</b>: krv neopúšťa cievy, látky sa vymieňajú cez tenké steny vlásočníc.",
+    "<b>Chrbtová cieva</b> sa sťahuje a ženie krv <b>dopredu</b>, k hlave.",
+    "<b>Brušná cieva</b> vedie krv <b>dozadu</b>.",
+    "V prednej časti ich spája <b>5 párov srdcových (pulzujúcich) ciev</b>.",
+    "Krv je červená vďaka <b>hemoglobínu</b>, ktorý je rozpustený priamo v krvnej plazme. Dážďovka dýcha celým povrchom tela, preto potrebuje vlhkú kožu."
+  ],
+  why: { q: "Prečo je uzavretá sústava výhodnejšia ako otvorená?",
+    a: "Krv tečie pod vyšším tlakom a rýchlejšie. Dá sa nasmerovať do orgánov, ktoré ju práve potrebujú, a celkovo jej treba menej." },
+  checks: [
+    { q: "Ktorým smerom tečie krv v chrbtovej cieve dážďovky?", o: ["Dopredu, k hlave", "Dozadu", "Strieda smer"], a: 0,
+      e: "Chrbtom dopredu, bruchom dozadu. U kopijovca a stavovcov je to presne naopak." },
+    { q: "Kde má dážďovka hemoglobín?", o: ["Rozpustený v krvnej plazme", "V červených krvinkách ako človek", "Dážďovka hemoglobín nemá"], a: 0,
+      e: "Hemoglobín dážďovky je voľne v plazme. Do červených krviniek ho „zabalili“ až stavovce." }
+  ],
+  remember: "Dážďovka: chrbtom dopredu, bruchom dozadu, 5 párov „sŕdc“."
+},
+{
+  id: 4, short: "Kopijovec", chip: "bez srdca", era: "~ 530",
+  group: "Bezlebkovce (strunovce)", examples: "kopijovec",
+  lead: "Kopijovec ukazuje stavebný plán, z ktorého vychádzajú stavovce. Krv má už smer toku ako u stavovcov, ale srdce ešte nie.",
+  predict: { q: "Kopijovec nemá srdce. Ktorým smerom tečie krv v jeho brušnej cieve?",
+    o: ["Dopredu, k žiabrovým štrbinám", "Dozadu, ako u dážďovky", "Nikam, krv stojí"], a: 0,
+    note: "Je to opak dážďovky. Rovnaký smer majú všetky stavovce: na brušnej strane dopredu, na chrbtovej dozadu." },
+  diagram: "lancelet",
+  caption: "Kopijovec, hlava vľavo. Pulzujúca brušná cieva ženie bezfarebnú krv dopredu cez žiabre, chrbtová aorta ju vedie dozadu do tela.",
+  points: [
+    "<b>Uzavretá</b> obehová sústava, ale <b>bez srdca</b>. Krv poháňa sťahovanie <b>brušnej cievy</b> a pulzujúce bázy žiabrových tepien.",
+    "V <b>brušnej</b> cieve tečie krv <b>dopredu</b> k žiabrovým štrbinám, v <b>chrbtovej aorte</b> <b>dozadu</b> do tela.",
+    "Krv je <b>bezfarebná</b>. Nemá dýchacie farbivo ani krvinky prenášajúce kyslík. Kyslík preniká difúziou cez tenkú kožu."
+  ],
+  why: { q: "Prečo je kopijovec dôležitý pre pochopenie vývoja srdca?",
+    a: "Má rovnaký smer prúdenia ako stavovce. Z pulzujúceho úseku brušnej cievy sa u stavovcov vyvinulo srdce. Preto aj naše srdce leží na brušnej (prednej) strane tela." },
+  checks: [
+    { q: "V ktorej cieve tečie u kopijovca krv dopredu?", o: ["V brušnej", "V chrbtovej", "V oboch"], a: 0,
+      e: "Brušná cieva vedie krv dopredu k žiabrom, chrbtová aorta dozadu. Dážďovka to má naopak." },
+    { q: "Akú krv má kopijovec?", o: ["Bezfarebnú", "Červenú s hemoglobínom", "Modrastú s hemocyanínom"], a: 0,
+      e: "Krv kopijovca nemá dýchacie farbivo, kyslík prijíma difúziou cez kožu." }
+  ],
+  remember: "Kopijovec: bez srdca, bezfarebná krv, smer toku ako stavovce."
+},
+{
+  id: 5, short: "Ryby", chip: "2 oddiely", era: "~ 500",
+  group: "Ryby", examples: "kapor, pstruh, žralok",
+  lead: "Srdce má oddiely radené za sebou. Krv ním prejde raz za jeden obeh: zo srdca do žiabier a odtiaľ rovno do tela.",
+  predict: { q: "Akú krv má ryba v srdci?",
+    o: ["Len odkysličenú", "Len okysličenú", "Zmiešanú"], a: 0,
+    note: "Krv prichádza do srdca z tela a srdce ju posiela do žiabier. Okysličí sa až za srdcom. Preto rybie srdce nazývame žilové." },
+  diagram: "fish",
+  caption: "Jeden obeh. Celé srdce je modré: obsahuje len odkysličenú krv. Červená je až za žiabrami.",
+  legend: ["deoxy", "oxy"],
+  points: [
+    "Srdce je <b>dvojdielne</b>: <b>predsieň</b> a <b>komora</b>. Pred predsieňou je <b>žilový splav</b>, za komorou <b>tepnový násadec</b> (bulbus arteriosus), ktorý vyrovnáva tlak.",
+    "<b>Jeden krvný obeh</b>: srdce → žiabre → telo → srdce.",
+    "Srdcom prechádza len <b>odkysličená krv</b>, preto ho voláme <b>žilové srdce</b>.",
+    "Za žiabrami krv stráca tlak a k orgánom tečie pomalšie. Ryby sú <b>premenlivo teplé</b>."
+  ],
+  why: { q: "Prečo by jeden obeh nestačil živočíchovi na súši?",
+    a: "Za žiabrami prúdi krv k orgánom pod nízkym tlakom. Na súši telo nenesie voda, pohyb je náročnejší a pľúca potrebujú vlastný prívod krvi. Preto sa u obojživelníkov objavuje druhý obeh, ktorý krv po okysličení vráti do srdca a to ju znova natlakuje." },
+  checks: [
+    { q: "Kadiaľ prejde krv ryby za jeden obeh?", o: ["Srdce → žiabre → telo → srdce", "Srdce → telo → žiabre → srdce", "Srdce → žiabre → srdce → telo"], a: 0,
+      e: "Z komory ide krv do žiabier, tam sa okysličí a chrbtovou aortou pokračuje do tela. Do srdca sa vracia odkysličená." },
+    { q: "Čo je tepnový násadec?", o: ["Rozšírenie za komorou, ktoré vyrovnáva tlak krvi idúcej do žiabier", "Prvý oddiel, do ktorého vteká krv z tela", "Cieva, ktorá vedie krv zo žiabier do tela"], a: 0,
+      e: "Prvý oddiel je žilový splav. Krv zo žiabier do tela vedie chrbtová aorta." }
+  ],
+  remember: "Ryba: 2 oddiely, 1 obeh, v srdci len odkysličená krv."
+},
+{
+  id: 6, short: "Obojživelníky", chip: "3 oddiely", era: "~ 370",
+  group: "Obojživelníky", examples: "skokan, ropucha, mlok",
+  lead: "S prechodom na súš prichádzajú pľúca a s nimi druhý obeh. Srdce má tri oddiely.",
+  predict: { q: "Žaba má dve predsiene, ale jednu komoru. Čo sa deje s krvou v komore?",
+    o: ["Okysličená a odkysličená krv sa čiastočne zmiešajú", "Komora ich dokonale oddelí", "Do komory vteká len odkysličená krv"], a: 0,
+    note: "Do spoločnej komory priteká krv z oboch predsiení. Čiastočne sa zmieša a do tela odchádza zmiešaná krv." },
+  diagram: "amph",
+  caption: "Dva obehy, ale jedna komora. Fialová znamená zmiešanú krv.",
+  legend: ["deoxy", "oxy", "mix"],
+  points: [
+    "<b>Trojdielne srdce</b>: dve predsiene a jedna komora.",
+    "<b>Dva krvné obehy</b>. <b>Malý (pľúcny)</b> vedie krv do pľúc a kože, <b>veľký (telový)</b> do tela.",
+    "Do <b>pravej predsiene</b> prichádza odkysličená krv z tela, do <b>ľavej predsiene</b> okysličená z pľúc.",
+    "V spoločnej komore sa krv <b>čiastočne mieša</b>. Špirálová chlopňa za komorou ju sčasti usmerní, takže viac odkysličenej krvi ide do pľúc.",
+    "Veľkú časť kyslíka prijímajú <b>kožou</b>, preto ju majú vlhkú."
+  ],
+  why: { q: "Prečo obojživelníkom nevadí, že sa im krv mieša?",
+    a: "Sú premenlivo teplé a majú nízku spotrebu energie. Časť kyslíka navyše dostávajú kožou, takže im stačí aj zmiešaná krv." },
+  checks: [
+    { q: "Koľko oddielov má srdce obojživelníka?", o: ["Tri: dve predsiene, jednu komoru", "Dva: predsieň a komoru", "Štyri: dve predsiene, dve komory"], a: 0,
+      e: "Dve predsiene a jedna spoločná komora, v ktorej sa krv čiastočne mieša." },
+    { q: "Do ktorej predsiene obojživelníka vteká krv z pľúc?", o: ["Do ľavej", "Do pravej", "Do oboch rovnako"], a: 0,
+      e: "Okysličená krv z pľúc ide pľúcnymi žilami do ľavej predsiene. Pravá dostáva krv z tela." }
+  ],
+  remember: "Žaba: 3 oddiely, 2 obehy, zmiešaná krv v komore."
+},
+{
+  id: 7, short: "Plazy", chip: "3 + priehradka", era: "~ 320",
+  group: "Plazy", examples: "jašterica, užovka, korytnačka, krokodíl",
+  lead: "V komore rastie priehradka. Krv sa mieša menej, ale úplne oddelená ešte nie je.",
+  predict: { q: "Ktorý plaz má komoru úplne rozdelenú priehradkou?",
+    o: ["Krokodíl", "Jašterica", "Užovka"], a: 0,
+    note: "Krokodíly majú štvordielne srdce. Krv sa im aj tak trochu mieša, ale až mimo srdca, cez Panizzov otvor." },
+  diagram: "rept",
+  caption: "Neúplná priehradka v komore. Ľavá a pravá polovica sú už takmer oddelené, krv sa mieša len málo.",
+  legend: ["deoxy", "oxy", "mix"],
+  points: [
+    "Srdce je <b>trojdielne</b>, ale v komore je <b>neúplná priehradka</b>, takže krv sa mieša len málo.",
+    "<b>Krokodíly</b> majú priehradku úplnú, ich srdce je štvordielne. Krv sa im mieša mimo srdca cez <b>Panizzov otvor</b>, ktorý spája oba oblúky aorty.",
+    "Plazy majú <b>dva oblúky aorty</b>, ľavý aj pravý.",
+    "Sú <b>premenlivo teplé</b>. Dýchajú už len pľúcami, koža je suchá a pokrytá šupinami."
+  ],
+  why: { q: "Prečo môže byť pre plaza miešanie krvi niekedy výhodné?",
+    a: "Keď sa korytnačka alebo krokodíl ponorí a nedýcha, krv môže obísť pľúca. Srdce tak zbytočne nepumpuje krv do orgánu, ktorý práve nič neprijíma." },
+  checks: [
+    { q: "Čím sa líši srdce väčšiny plazov od srdca obojživelníkov?", o: ["V komore má neúplnú priehradku", "Má len jednu predsieň", "Má štyri úplne oddelené oddiely"], a: 0,
+      e: "Neúplná priehradka zmenšuje miešanie krvi. Štyri úplné oddiely majú z plazov len krokodíly." },
+    { q: "Čo je Panizzov otvor?", o: ["Spojenie pravého a ľavého oblúka aorty u krokodílov", "Otvor v priehradke medzi predsieňami žaby", "Otvor v srdci hmyzu"], a: 0,
+      e: "Cez Panizzov otvor sa u krokodílov mieša krv mimo srdca, hoci srdce samotné je štvordielne." }
+  ],
+  remember: "Plaz: 3 oddiely a neúplná priehradka. Krokodíl má 4."
+},
+{
+  id: 8, short: "Vtáky a cicavce", chip: "4 oddiely", era: "~ 200",
+  group: "Vtáky a cicavce", examples: "holub, sokol, pes, veľryba, človek",
+  lead: "Štyri oddiely a dva úplne oddelené obehy. Okysličená a odkysličená krv sa už nemiešajú.",
+  predict: { q: "Prečo majú práve vtáky a cicavce srdce s úplne oddelenými polovicami?",
+    o: ["Sú stálotepelné a potrebujú veľa kyslíka", "Sú zo všetkých živočíchov najväčšie", "Žijú iba na súši"], a: 0,
+    note: "Udržať stálu telesnú teplotu stojí veľa energie, a teda aj kyslíka. Nezmiešaná krv ho do tkanív dopraví najviac." },
+  diagram: "four",
+  caption: "Schému kreslíme, akoby sme sa na srdce pozerali spredu. Pravá polovica srdca je preto na obrázku vľavo.",
+  legend: ["deoxy", "oxy"],
+  points: [
+    "<b>Štvordielne srdce</b>: dve predsiene a dve komory, <b>úplná priehradka</b>.",
+    "<b>Pravá polovica</b> obsahuje len odkysličenú krv, <b>ľavá</b> len okysličenú.",
+    "<b>Malý (pľúcny) obeh</b>: pravá komora → pľúcnica → pľúca → pľúcne žily → ľavá predsieň.<br><b>Veľký (telový) obeh</b>: ľavá komora → aorta → telo → duté žily → pravá predsieň.",
+    "Ostal <b>len jeden oblúk aorty</b>: vtáky majú <b>pravý</b>, cicavce <b>ľavý</b>. Štvordielne srdce vzniklo v oboch skupinách nezávisle.",
+    "Červené krvinky cicavcov <b>nemajú jadro</b>, krvinky vtákov ho majú."
+  ],
+  why: { q: "Prečo má ľavá komora hrubšiu stenu ako pravá?",
+    a: "Pravá komora ženie krv len do blízkych pľúc. Ľavá ju musí pretlačiť celým telom až do končekov prstov a na to treba oveľa vyšší tlak." },
+  checks: [
+    { q: "Ktorý oblúk aorty majú cicavce?", o: ["Ľavý", "Pravý", "Oba"], a: 0,
+      e: "Cicavce ľavý, vtáky pravý, plazy oba. Pomôcka: srdce aj oblúk aorty máme vľavo." },
+    { q: "Tepna je cieva, ktorá…", o: ["vedie krv zo srdca", "vedie vždy okysličenú krv", "vedie krv do srdca"], a: 0,
+      e: "Názov cievy určuje smer, nie kyslík. Pľúcnica je tepna, a predsa vedie odkysličenú krv. Pľúcne žily vedú okysličenú." },
+    { q: "Kde začína veľký (telový) obeh?", o: ["V ľavej komore", "V pravej komore", "V pravej predsieni"], a: 0,
+      e: "Veľký obeh začína v ľavej komore a končí v pravej predsieni. Malý začína v pravej komore a končí v ľavej predsieni." }
+  ],
+  remember: "Vták aj cicavec: 4 oddiely, krv sa nemieša. Vták má pravý oblúk aorty, cicavec ľavý."
+}
+];
+
+const EXTRA_TEST = [
+  { s: 2, q: "Ako sa volá telová dutina, do ktorej sa vylieva hemolymfa?", o: ["Hemocél", "Gastrovaskulárna dutina", "Osrdcovník"], a: 0, e: "Hemocél je telová dutina článkonožcov a mäkkýšov, kde hemolymfa obmýva orgány." },
+  { s: 2, q: "Koľko sŕdc má chobotnica?", o: ["Tri", "Jedno", "Päť párov"], a: 0, e: "Dve žiabrové a jedno telové srdce. Päť párov srdcových ciev má dážďovka." },
+  { s: 2, q: "Ktoré dýchacie farbivo obsahuje meď?", o: ["Hemocyanín", "Hemoglobín", "Myoglobín"], a: 0, e: "Hemocyanín majú mäkkýše a kôrovce, okysličený je modrastý. Hemoglobín obsahuje železo." },
+  { s: 5, q: "Prečo hovoríme, že ryba má „žilové srdce“?", o: ["Prechádza ním len odkysličená krv", "Je uložené pri veľkej žile", "Nemá komoru"], a: 0, e: "Krv sa okysličí až v žiabrach, teda za srdcom." },
+  { s: 6, q: "Kam vedie malý (pľúcny) obeh u obojživelníkov krv?", o: ["Do pľúc a kože", "Len do hlavy", "Do žiabier"], a: 0, e: "Pľúcnokožné tepny vedú krv do pľúc aj do kože, obojživelníky dýchajú oboma." },
+  { s: 7, q: "Koľko oblúkov aorty majú plazy?", o: ["Dva", "Jeden ľavý", "Jeden pravý"], a: 0, e: "Plazy majú ľavý aj pravý oblúk. Vtákom ostal pravý, cicavcom ľavý." },
+  { s: 8, q: "Ktorá cieva vedie u človeka okysličenú krv do srdca?", o: ["Pľúcne žily", "Pľúcnica", "Horná dutá žila"], a: 0, e: "Pľúcne žily privádzajú okysličenú krv z pľúc do ľavej predsiene." },
+  { s: 8, q: "Ktorá chlopňa je medzi ľavou predsieňou a ľavou komorou?", o: ["Dvojcípa", "Trojcípa", "Polmesiačikovitá"], a: 0, e: "Vľavo dvojcípa (mitrálna), vpravo trojcípa. Polmesiačikovité chlopne sú na začiatku aorty a pľúcnice." },
+  { s: 8, q: "Kde končí malý (pľúcny) obeh?", o: ["V ľavej predsieni", "V pravej predsieni", "V ľavej komore"], a: 0, e: "Pravá komora → pľúca → pľúcne žily → ľavá predsieň." },
+  { s: 8, q: "Čím sa líšia červené krvinky cicavcov od krviniek vtákov?", o: ["Nemajú jadro", "Sú väčšie", "Neobsahujú hemoglobín"], a: 0, e: "Bezjadrové krvinky majú viac miesta na hemoglobín. Vtáky, plazy, obojživelníky aj ryby majú krvinky s jadrom." },
+  { s: 3, q: "Ktorý živočích má uzavretú obehovú sústavu?", o: ["Dážďovka", "Rak", "Slimák"], a: 0, e: "Obrúčkavce majú uzavretú sústavu. Rak aj slimák majú otvorenú." },
+  { s: 1, q: "Prečo hubke stačí difúzia?", o: ["Jej bunky sú v priamom styku s vodou, ktorá prúdi telom", "Má gastrovaskulárnu dutinu", "Má malé srdce"], a: 0, e: "Voda prúdi pórmi cez celé telo hubky, takže každá bunka je blízko nej." }
+];
+
+const CARDS = [
+  ["Čo je difúzia?", "Samovoľný presun látok z miesta s vyššou koncentráciou na miesto s nižšou. Stačí len na veľmi krátku vzdialenosť."],
+  ["Gastrovaskulárna dutina", "Dutina pŕhlivcov (nezmar), ktorá slúži na trávenie aj na rozvod živín."],
+  ["Prečo sú ploskavce ploché?", "Ploché telo skracuje vzdialenosť buniek od povrchu, takže im stačí difúzia."],
+  ["Otvorená obehová sústava", "Krv (hemolymfa) sa vylieva z ciev do telovej dutiny (hemocélu) a obmýva orgány. Majú ju článkonožce a väčšina mäkkýšov."],
+  ["Hemolymfa", "Tekutina článkonožcov a mäkkýšov, ktorá je krvou aj medzibunkovou tekutinou."],
+  ["Ostiá", "Párové otvory v srdci (chrbtovej cieve) hmyzu, ktorými sa hemolymfa nasáva späť."],
+  ["Ako sa kyslík dostane k bunkám hmyzu?", "Vzdušnicami (trachejami). Hemolymfa hmyzu kyslík nenesie."],
+  ["Hemocyanín", "Dýchacie farbivo s meďou (mäkkýše, kôrovce). Okysličená krv je modrastá."],
+  ["Hlavonožce a obeh", "Uzavretá sústava a tri srdcia: dve žiabrové a jedno telové."],
+  ["Dážďovka: smer krvi", "Chrbtová cieva dopredu, brušná dozadu. Vpredu 5 párov srdcových ciev."],
+  ["Hemoglobín dážďovky", "Je rozpustený v krvnej plazme, nie v krvinkách."],
+  ["Kopijovec a srdce", "Srdce nemá. Krv poháňa pulzujúca brušná cieva. Krv je bezfarebná."],
+  ["Kopijovec: smer krvi", "Brušná cieva dopredu, chrbtová aorta dozadu. Rovnako ako u stavovcov."],
+  ["Srdce ryby", "Dvojdielne: predsieň a komora, pred nimi žilový splav, za nimi tepnový násadec."],
+  ["Obeh ryby", "Jeden obeh: srdce → žiabre → telo → srdce. V srdci len odkysličená krv (žilové srdce)."],
+  ["Srdce obojživelníka", "Trojdielne: dve predsiene, jedna komora. Krv sa v komore čiastočne mieša."],
+  ["Malý obeh obojživelníka", "Vedie krv do pľúc a kože (pľúcnokožné tepny)."],
+  ["Srdce plazov", "Trojdielne s neúplnou priehradkou v komore. Krokodíl: štvordielne."],
+  ["Panizzov otvor", "Spojenie ľavého a pravého oblúka aorty u krokodílov. Krv sa mieša mimo srdca."],
+  ["Oblúky aorty", "Plazy: oba. Vtáky: pravý. Cicavce: ľavý."],
+  ["Srdce vtákov a cicavcov", "Štvordielne, úplná priehradka, krv sa nemieša. Dva oddelené obehy."],
+  ["Veľký (telový) obeh", "Ľavá komora → aorta → telo → duté žily → pravá predsieň."],
+  ["Malý (pľúcny) obeh", "Pravá komora → pľúcnica → pľúca → pľúcne žily → ľavá predsieň."],
+  ["Tepna vs. žila", "Tepna vedie krv ZO srdca, žila DO srdca. O kyslíku to nehovorí nič (pľúcnica vedie odkysličenú krv)."],
+  ["Trojcípa a dvojcípa chlopňa", "Trojcípa: medzi pravou predsieňou a komorou. Dvojcípa (mitrálna): medzi ľavou predsieňou a komorou."],
+  ["Prečo je ľavá komora hrubšia?", "Ženie krv do celého tela, potrebuje vyšší tlak ako pravá, ktorá ženie krv len do pľúc."],
+  ["Krvinky cicavcov", "Červené krvinky cicavcov nemajú jadro, vtákov a ostatných stavovcov áno."]
+];
+
+const SORT_CATS = ["Bez obehovej sústavy", "Otvorená sústava", "Uzavretá, bez komôrkového srdca", "Dvojdielne srdce", "Trojdielne srdce", "Štvordielne srdce"];
+const ANIMALS = [
+  ["Hubka", 0, "Pórovce: voda prúdi cez telo, stačí difúzia."],
+  ["Nezmar", 0, "Pŕhlivec s gastrovaskulárnou dutinou."],
+  ["Medúza", 0, "Pŕhlivec, rozvod látok zabezpečuje gastrovaskulárna dutina."],
+  ["Planária", 0, "Ploskavec s rozvetvenou tráviacou dutinou."],
+  ["Včela", 1, "Hmyz: chrbtová cieva s ostiami, kyslík nesú vzdušnice."],
+  ["Rak", 1, "Kôrovec s hemocyanínom v hemolymfe."],
+  ["Pavúk", 1, "Článkonožec s otvorenou sústavou."],
+  ["Slimák", 1, "Mäkkýš s otvorenou sústavou a hemocyanínom."],
+  ["Dážďovka", 2, "Obrúčkavec: chrbtová a brušná cieva, 5 párov srdcových ciev."],
+  ["Pijavica", 2, "Obrúčkavec s uzavretou sústavou."],
+  ["Kopijovec", 2, "Bez srdca, krv ženie pulzujúca brušná cieva."],
+  ["Kapor", 3, "Ryba: predsieň a komora, jeden obeh."],
+  ["Žralok", 3, "Paryba: dvojdielne srdce, za komorou tepnový kužeľ."],
+  ["Skokan", 4, "Obojživelník: dve predsiene, jedna komora."],
+  ["Mlok", 4, "Obojživelník s trojdielnym srdcom."],
+  ["Jašterica", 4, "Plaz: trojdielne srdce s neúplnou priehradkou."],
+  ["Korytnačka", 4, "Plaz: trojdielne srdce s neúplnou priehradkou."],
+  ["Krokodíl", 5, "Výnimka medzi plazmi: štvordielne srdce, krv sa mieša cez Panizzov otvor."],
+  ["Holub", 5, "Vták: štvordielne srdce, pravý oblúk aorty."],
+  ["Netopier", 5, "Cicavec: štvordielne srdce, ľavý oblúk aorty."],
+  ["Veľryba", 5, "Cicavec, hoci žije vo vode: štvordielne srdce."],
+  ["Človek", 5, "Cicavec: štvordielne srdce, dva úplne oddelené obehy."]
+];
+
+const ROUTES = {
+  clovek: { name: "Človek", start: "Krv sa vrátila z tela dutými žilami.", steps: [
+    ["Pravá predsieň", "deoxy", "Krv z tela vteká najprv do predsiene. Do ktorej?"],
+    ["Trojcípa chlopňa", "deoxy", "Medzi pravou predsieňou a komorou je chlopňa."],
+    ["Pravá komora", "deoxy", "Chlopňa púšťa krv len jedným smerom: do komory."],
+    ["Pľúcnica", "deoxy", "Z pravej komory vychádza tepna do pľúc."],
+    ["Pľúca", "oxy", "Pľúcnica vedie krv tam, kde sa okysličí."],
+    ["Pľúcne žily", "oxy", "Okysličená krv sa vracia do srdca žilami."],
+    ["Ľavá predsieň", "oxy", "Malý obeh končí v predsieni na druhej strane."],
+    ["Dvojcípa chlopňa", "oxy", "Medzi ľavou predsieňou a komorou je ďalšia chlopňa."],
+    ["Ľavá komora", "oxy", "Najsilnejší oddiel srdca."],
+    ["Aorta", "oxy", "Z ľavej komory vychádza najväčšia tepna tela."],
+    ["Vlásočnice v tkanivách", "deoxy", "Tu krv odovzdá kyslík bunkám."],
+    ["Duté žily", "deoxy", "Odkysličená krv sa vracia do srdca."]
+  ], decoys: ["Žiabre", "Chrbtová aorta"] },
+  ryba: { name: "Ryba", start: "Krv sa vrátila z tela žilami.", steps: [
+    ["Žilový splav", "deoxy", "Pred predsieňou je zberný oddiel."],
+    ["Predsieň", "deoxy", "Zo žilového splavu ide krv do predsiene."],
+    ["Komora", "deoxy", "Z predsiene do komory, ktorá krv vytlačí."],
+    ["Tepnový násadec", "deoxy", "Za komorou je rozšírenie, ktoré vyrovnáva tlak."],
+    ["Žiabrové tepny", "deoxy", "Krv musí ísť najprv sa okysličiť."],
+    ["Žiabre", "oxy", "Tu krv prijme kyslík z vody."],
+    ["Chrbtová aorta", "oxy", "Zo žiabier ide krv rovno do tela, bez návratu do srdca."],
+    ["Vlásočnice v tkanivách", "deoxy", "Tu krv odovzdá kyslík bunkám."],
+    ["Žily", "deoxy", "Odkysličená krv sa vracia k srdcu."]
+  ], decoys: ["Pľúca", "Ľavá predsieň"] },
+  zaba: { name: "Žaba", start: "Krv sa vrátila z tela dutými žilami.", steps: [
+    ["Pravá predsieň", "deoxy", "Krv z tela vteká do predsiene. Do ktorej?"],
+    ["Komora", "mix", "Obe predsiene ústia do jednej spoločnej komory."],
+    ["Pľúcnokožné tepny", "mix", "Časť krvi z komory ide okysličiť sa."],
+    ["Pľúca", "oxy", "Tu sa krv okysličí. (Krv z kože sa vracia do pravej predsiene.)"],
+    ["Pľúcne žily", "oxy", "Okysličená krv sa vracia do srdca."],
+    ["Ľavá predsieň", "oxy", "Malý obeh končí v ľavej predsieni."],
+    ["Komora", "mix", "Opäť tá istá spoločná komora. Krv sa tu mieša."],
+    ["Oblúky aorty", "mix", "Z komory odchádza krv do tela."],
+    ["Vlásočnice v tkanivách", "deoxy", "Tu krv odovzdá kyslík bunkám."],
+    ["Duté žily", "deoxy", "Odkysličená krv sa vracia do srdca."]
+  ], decoys: ["Ľavá komora", "Žiabre"] }
+};
+
+/* =========================================================
+   STAV
+   ========================================================= */
+const KEY = "srdce-v-case-v1";
+function load() { try { return Object.assign({ done: {}, boxes: {}, best: null }, JSON.parse(localStorage.getItem(KEY) || "{}")); } catch (e) { return { done: {}, boxes: {}, best: null }; } }
+function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+const S = load();
+let ui = {};
+const app = document.getElementById("app");
+
+const shuffle = (arr) => { const a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const doneCount = () => STATIONS.filter(s => S.done[s.id]).length;
+const nextStation = () => STATIONS.find(s => !S.done[s.id]);
+const learned = () => CARDS.filter((_, i) => (S.boxes[i] || 0) >= 3).length;
+const go = (h) => { location.hash = h; };
+
+/* =========================================================
+   SCHÉMY (SVG)
+   ========================================================= */
+let uid = 0;
+function markers(p) {
+  return `<defs>${["oxy","deoxy","mix","mixb","mixr","hemo","pale","ink"].map(c =>
+    `<marker id="${p}-${c}" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="4.5" markerHeight="4.5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10z" class="f-${c}"/></marker>`).join("")}</defs>`;
+}
+function flow(p, d, c) { return `<path d="${d}" class="track s-${c}"/><path d="${d}" class="flow s-${c}" marker-end="url(#${p}-${c})"/>`; }
+function box(x, y, w, h, cls, l1, l2) {
+  const cx = x + w / 2, cy = y + h / 2;
+  const t = l2 ? `<text x="${cx}" y="${cy - 2}" text-anchor="middle" class="ttl">${l1}</text><text x="${cx}" y="${cy + 12}" text-anchor="middle" class="lbl">${l2}</text>`
+               : `<text x="${cx}" y="${cy + 4}" text-anchor="middle" class="ttl">${l1}</text>`;
+  return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="7" class="${cls}"/>${t}`;
+}
+function vlabel(x, y, t, anchor = "middle") { return `<text x="${x}" y="${y}" class="lbl" text-anchor="${anchor}" transform="rotate(-90 ${x} ${y})">${t}</text>`; }
+
+function diagram(type) {
+  const p = "m" + (++uid);
+  const open = (vb, label) => `<svg class="sv" viewBox="${vb}" role="img" aria-label="${label}">${markers(p)}`;
+  if (type === "diffusion") {
+    const dots = [[-50,-10],[50,-14],[-46,22],[48,26],[-30,-40],[34,-42]].map(([dx,dy], i) =>
+      `<circle cx="180" cy="${140 + (i%3)*12 - 10}" r="3.2" class="f-deoxy dot" style="--dx:${dx*1.6}px;--dy:${dy}px;animation-delay:${i*0.42}s"/>`).join("");
+    return open("0 0 360 260", "Nezmar v reze, difúzia z dutiny do buniek") +
+      `<path d="M110 230 C80 230 74 200 74 160 L74 70 C74 46 92 34 120 34 L150 34 L150 52 L120 52 C106 52 98 60 98 74 L98 162 C98 196 110 206 180 206 C250 206 262 196 262 162 L262 74 C262 60 254 52 240 52 L210 52 L210 34 L240 34 C268 34 286 46 286 70 L286 160 C286 200 280 230 250 230 Z" class="faint"/>
+       <path d="M98 74 C98 60 106 52 120 52 L150 52 M210 52 L240 52 C254 52 262 60 262 74 L262 162 C262 196 250 206 180 206 C110 206 98 196 98 162 Z" class="wall" stroke-dasharray="3 4"/>
+       ${dots}
+       <text x="180" y="24" text-anchor="middle" class="lbl">ústny otvor</text>
+       <path d="M180 30 L180 46" class="s-ink" stroke-width="1.5" marker-end="url(#${p}-ink)"/>
+       <text x="180" y="120" text-anchor="middle" class="ttl">gastrovaskulárna</text>
+       <text x="180" y="135" text-anchor="middle" class="ttl">dutina</text>
+       <text x="300" y="120" class="lbl">stena tela:</text><text x="300" y="132" class="lbl">2 vrstvy</text><text x="300" y="144" class="lbl">buniek</text>
+       <text x="16" y="120" class="lbl">voda</text><text x="16" y="132" class="lbl">s O₂</text>
+       <path d="M44 150 L68 150" class="s-ink" stroke-width="1.5" marker-end="url(#${p}-ink)"/>
+       <text x="180" y="252" text-anchor="middle" class="lbl">● látky sa šíria difúziou z dutiny do buniek</text></svg>`;
+  }
+  if (type === "open") {
+    return open("0 0 360 230", "Otvorená obehová sústava hmyzu") +
+      `<ellipse cx="180" cy="122" rx="160" ry="76" class="ch-hemo" style="opacity:.55"/>
+       <rect x="120" y="70" width="190" height="16" rx="8" class="ch-hemo pulse"/>
+       ${[160,200,240,280].map(x => `<path d="M${x-5} 88 L${x} 82 L${x+5} 88" fill="none" class="s-ink" stroke-width="1.5"/>`).join("")}
+       ${flow(p, "M300 78 L130 78 C90 78 60 90 40 112", "hemo")}
+       ${flow(p, "M50 140 C90 180 220 190 300 160", "hemo")}
+       ${flow(p, "M312 150 C326 128 300 104 282 92", "hemo")}
+       ${flow(p, "M110 150 C150 130 190 118 200 92", "hemo")}
+       <text x="214" y="58" text-anchor="middle" class="ttl">srdce = chrbtová cieva</text>
+       <text x="222" y="108" class="lbl">ostiá</text>
+       <text x="20" y="60" class="lbl">aorta → hlava</text>
+       <text x="160" y="214" text-anchor="middle" class="lbl">hemocél (telová dutina) – hemolymfa obmýva orgány</text>
+       <text x="20" y="34" class="lbl">◀ vpredu</text><text x="340" y="34" text-anchor="end" class="lbl">vzadu ▶</text></svg>`;
+  }
+  if (type === "worm") {
+    const rings = [70, 92, 114, 136, 158].map(x => `<path d="M${x} 74 L${x} 126" class="s-oxy pulse" stroke-width="4" stroke-linecap="round" marker-end="url(#${p}-oxy)"/>`).join("");
+    return open("0 0 360 200", "Uzavretá obehová sústava dážďovky") +
+      `<rect x="16" y="40" width="328" height="120" rx="60" class="faint"/>
+       ${[200,220,240,260,280,300].map(x => `<line x1="${x}" y1="44" x2="${x}" y2="156" class="s-ink" stroke-width=".6" opacity=".35"/>`).join("")}
+       ${flow(p, "M330 66 L44 66", "oxy")}
+       ${flow(p, "M44 134 L330 134", "oxy")}
+       ${rings}
+       ${[220, 260, 300].map(x => `<path d="M${x} 136 C${x-10} 110 ${x+10} 90 ${x} 66" class="s-oxy" fill="none" stroke-width="1.2" opacity=".6"/>`).join("")}
+       <text x="232" y="58" class="ttl">chrbtová cieva → dopredu</text>
+       <text x="232" y="152" class="ttl">brušná cieva → dozadu</text>
+       <text x="114" y="182" text-anchor="middle" class="lbl">5 párov srdcových ciev</text>
+       <text x="270" y="110" class="lbl">vlásočnice</text>
+       <text x="20" y="24" class="lbl">◀ hlava</text></svg>`;
+  }
+  if (type === "lancelet") {
+    return open("0 0 360 200", "Obehová sústava kopijovca") +
+      `<path d="M16 100 C80 54 260 50 344 100 C260 150 80 146 16 100 Z" class="faint"/>
+       ${[74,92,110,128,146].map(x => `<line x1="${x-6}" y1="84" x2="${x+6}" y2="116" class="s-ink" stroke-width="1.2" opacity=".5"/>`).join("")}
+       ${flow(p, "M290 124 L60 124", "pale")}
+       ${[80,104,128,152].map(x => `<path d="M${x} 122 L${x} 80" class="s-pale" stroke-width="2.5" marker-end="url(#${p}-pale)"/>`).join("")}
+       ${flow(p, "M60 76 L300 76", "pale")}
+       <rect x="180" y="116" width="80" height="16" rx="8" class="faint pulse" style="stroke:var(--pale)"/>
+       <text x="220" y="62" text-anchor="middle" class="ttl">chrbtová aorta → dozadu</text>
+       <text x="200" y="152" text-anchor="middle" class="ttl">brušná cieva (pulzuje) → dopredu</text>
+       <text x="112" y="172" text-anchor="middle" class="lbl">žiabrové štrbiny</text>
+       <text x="20" y="24" class="lbl">◀ hlava</text>
+       <text x="340" y="24" text-anchor="end" class="lbl">krv je bezfarebná</text></svg>`;
+  }
+  /* Stavovce: schéma ako obvod. Hore dýchací orgán, dole telo, v strede srdce. */
+  const top = type === "fish" ? "Žiabre" : (type === "amph" ? "Pľúca a koža" : "Pľúca");
+  let s = open("0 0 360 310", "Schéma srdca a krvných obehov") +
+    box(126, 20, 108, 36, "organ", top) + box(126, 254, 108, 36, "organ", "Telo");
+  if (type === "fish") {
+    s += box(96, 100, 168, 46, "ch-deoxy", "predsieň", "pred ňou žilový splav") +
+         box(96, 152, 168, 60, "ch-deoxy", "komora", "za ňou tepnový násadec") +
+         flow(p, "M126 272 H48 V123 H90", "deoxy") +
+         flow(p, "M96 182 H72 V38 H120", "deoxy") +
+         flow(p, "M234 38 H312 V272 H240", "oxy") +
+         vlabel(38, 200, "žily z tela") + vlabel(84, 78, "do žiabier") + vlabel(326, 160, "chrbtová aorta") +
+         `<text x="180" y="240" text-anchor="middle" class="lbl">jeden obeh</text>`;
+  } else {
+    s += box(96, 100, 80, 46, "ch-deoxy", "pravá", "predsieň") + box(184, 100, 80, 46, "ch-oxy", "ľavá", "predsieň");
+    if (type === "four") {
+      s += box(96, 152, 80, 60, "ch-deoxy", "pravá", "komora") + box(184, 152, 80, 60, "ch-oxy", "ľavá", "komora") +
+           `<line x1="180" y1="100" x2="180" y2="212" class="sept"/>`;
+    } else if (type === "rept") {
+      s += `<rect x="96" y="152" width="84" height="60" rx="7" class="ch-mixb"/><rect x="180" y="152" width="84" height="60" rx="7" class="ch-mixr"/>
+            <line x1="180" y1="100" x2="180" y2="146" class="sept"/><line x1="180" y1="212" x2="180" y2="176" class="sept"/>
+            <text x="180" y="168" text-anchor="middle" class="ttl">komora</text>
+            <text x="180" y="226" text-anchor="middle" class="lbl">neúplná priehradka</text>`;
+    } else {
+      s += box(96, 152, 168, 60, "ch-mix", "komora", "krv sa čiastočne mieša") + `<line x1="180" y1="100" x2="180" y2="146" class="sept"/>`;
+    }
+    const outL = type === "four" ? "deoxy" : type === "rept" ? "mixb" : "mix";
+    const outR = type === "four" ? "oxy" : type === "rept" ? "mixr" : "mix";
+    s += flow(p, "M126 272 H48 V123 H90", "deoxy") +
+         flow(p, "M96 182 H72 V38 H120", outL) +
+         flow(p, "M234 38 H288 V123 H270", "oxy") +
+         flow(p, "M264 182 H312 V272 H240", outR) +
+         vlabel(38, 200, "duté žily") + vlabel(84, 78, type === "amph" ? "pľúcnokožné t." : "pľúcnica") +
+         vlabel(300, 78, "pľúcne žily") + vlabel(326, 200, type === "four" ? "aorta" : "oblúky aorty") +
+         `<text x="180" y="78" text-anchor="middle" class="lbl">malý (pľúcny) obeh</text>` +
+         (type !== "rept" ? `<text x="180" y="240" text-anchor="middle" class="lbl">veľký (telový) obeh</text>` : "");
+  }
+  return s + "</svg>";
+}
+const LEG = { deoxy: "odkysličená krv", oxy: "okysličená krv", mix: "zmiešaná krv" };
+const legend = (keys) => keys ? `<div class="legend">${keys.map(k => `<span><i style="background:var(--${k})"></i>${LEG[k]}</span>`).join("")}</div>` : "";
+
+/* =========================================================
+   VIEWS
+   ========================================================= */
+function homeView() {
+  const n = doneCount(), next = nextStation();
+  const due = CARDS.length - learned();
+  app.innerHTML = `
+  <section class="hero">
+    <span class="eyebrow">Obehová sústava · fylogenéza</span>
+    <h1>Od difúzie po <span class="beat">štvordielne srdce</span></h1>
+    <p class="lede">Prejdi osem zastávok evolúcie. Na každej si najprv tipneš, potom uvidíš schému, krátky výklad a overíš si, či to sedí. Jedna zastávka trvá asi tri minúty.</p>
+    <div class="progress-line">
+      ${next ? `<a class="btn" href="#stanica-${next.id}">${n ? "Pokračovať" : "Začať"}: ${next.short} →</a>`
+             : `<a class="btn" href="#test">Všetko prejdené. Skúška →</a>`}
+      <div class="stack" style="gap:6px">
+        <div class="pips">${STATIONS.map(s => `<span class="pip ${S.done[s.id] ? "on" : ""}"></span>`).join("")}</div>
+        <span class="mono">${n} z ${STATIONS.length} zastávok</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-head"><h2>Mapa cesty</h2><span class="mono">pred mil. rokov</span></div>
+  <ol class="timeline">
+    ${STATIONS.map(s => `<li class="stop ${S.done[s.id] ? "done" : ""} ${next && next.id === s.id ? "next" : ""}">
+      <a href="#stanica-${s.id}">
+        <span class="era">${s.era}</span><span class="node"></span>
+        <span class="name"><strong>${s.short}</strong><span>${s.group === s.short ? s.examples : s.group}</span></span>
+        <span class="chip">${s.chip}</span>
+      </a></li>`).join("")}
+  </ol>
+  <p class="note" style="margin-top:14px">Nie je to rebrík. Hmyz ani dážďovka nie sú naši predkovia, sú to iné vetvy s vlastnými riešeniami. Čísla udávajú približný vek najstarších fosílií skupiny.</p>
+
+  <div class="section-head"><h2>Precvičovanie</h2></div>
+  <div class="modes">
+    <a class="mode" href="#kvapka"><h3>Cesta kvapky <span class="chip">hra</span></h3><p>Preveď kvapku krvi srdcom ryby, žaby alebo človeka, krok za krokom.</p></a>
+    <a class="mode" href="#triedenie"><h3>Kam patrí? <span class="chip">hra</span></h3><p>Priraď živočícha k typu obehovej sústavy. Pozor na výnimky.</p></a>
+    <a class="mode" href="#karticky"><h3>Kartičky <span class="chip">opakovanie</span></h3><p>Kartičky, ktoré nevieš, sa vracajú častejšie.</p><span class="mono meta">naučené ${learned()} / ${CARDS.length}</span></a>
+    <a class="mode" href="#test"><h3>Skúška <span class="chip">12 otázok</span></h3><p>Zmiešané otázky zo všetkých zastávok, s vysvetlením chýb.</p><span class="mono meta">${S.best != null ? "najlepšie " + S.best + " / 12" : "ešte neskúšané"}</span></a>
+  </div>
+  <p style="margin-top:20px"><a class="btn ghost wide" href="#tahak">Ťahák: všetko na jednej strane</a></p>`;
+}
+
+/* ---------- Stanica ---------- */
+function stationSteps(st) {
+  return ["intro", "diagram", "points", "why", ...st.checks.map((_, i) => "check" + i), "done"];
+}
+function optsHtml(opts, chosen, answer, name) {
+  return `<div class="opts">${opts.map((o, i) => {
+    let cls = "";
+    if (chosen != null) cls = o.i === answer ? "right" : (i === chosen ? "wrong" : "dim");
+    return `<button class="opt ${cls}" data-act="${name}" data-i="${i}" ${chosen != null ? "disabled" : ""}><span class="k">${"ABC"[i]}</span><span>${o.t}</span></button>`;
+  }).join("")}</div>`;
+}
+function stationView(id) {
+  const st = STATIONS.find(s => s.id === id);
+  if (!st) return go("");
+  if (ui.view !== "st" + id) {
+    ui = { view: "st" + id, step: 0, pred: null, chk: {}, shown: false,
+      predOpts: shuffle(st.predict.o.map((t, i) => ({ t, i }))),
+      chkOpts: st.checks.map(c => shuffle(c.o.map((t, i) => ({ t, i })))) };
+  }
+  const steps = stationSteps(st), step = steps[ui.step];
+  let body = "", canNext = true;
+  if (step === "intro") {
+    const answered = ui.pred != null;
+    canNext = answered;
+    const correct = answered && ui.predOpts[ui.pred].i === st.predict.a;
+    body = `<div class="card">
+      <span class="eyebrow">Zastávka ${st.id} z ${STATIONS.length} · vek skupiny ${st.era} mil. r.</span>
+      <h2>${st.short}</h2>
+      <p class="muted">${st.group}: ${st.examples}</p>
+      <p class="lead">${st.lead}</p>
+      <div class="predict">
+        <span class="eyebrow">Najprv tipni, aj keď to nevieš</span>
+        <h3>${st.predict.q}</h3>
+        ${optsHtml(ui.predOpts, ui.pred, st.predict.a, "pred")}
+        ${answered ? `<div class="feedback ${correct ? "good" : "miss"}"><strong>${correct ? "Dobrý odhad." : "Tentoraz nie, a to je v poriadku."}</strong>${st.predict.note}</div>` : ""}
+      </div></div>`;
+  } else if (step === "diagram") {
+    body = `<div class="card"><span class="eyebrow">Schéma</span><h2>${st.short}</h2>
+      <div class="diagram">${diagram(st.diagram)}</div>${legend(st.legend)}<p class="muted">${st.caption}</p></div>`;
+  } else if (step === "points") {
+    body = `<div class="card"><span class="eyebrow">Čo si zapamätať</span><h2>${st.short}</h2>
+      <ul class="points">${st.points.map(p => `<li><span>${p}</span></li>`).join("")}</ul></div>`;
+  } else if (step === "why") {
+    body = `<div class="card"><span class="eyebrow">Prečo to tak je?</span><h2>${st.why.q}</h2>
+      ${ui.shown ? `<div class="feedback good"><strong>Vysvetlenie</strong>${st.why.a}</div>`
+                 : `<div class="hidden-answer stack"><p class="muted">Skús si odpoveď povedať v duchu alebo nahlas. Vysvetľovanie vlastnými slovami je jeden z najúčinnejších spôsobov učenia.</p><button class="btn ghost" data-act="reveal">Ukázať vysvetlenie</button></div>`}
+    </div>`;
+  } else if (step.startsWith("check")) {
+    const k = +step.slice(5), c = st.checks[k], ch = ui.chk[k];
+    canNext = ch != null;
+    const correct = ch != null && ui.chkOpts[k][ch].i === c.a;
+    body = `<div class="card"><span class="eyebrow">Over si · otázka ${k + 1} z ${st.checks.length}</span><h2>${c.q}</h2>
+      ${optsHtml(ui.chkOpts[k], ch, c.a, "chk")}
+      ${ch != null ? `<div class="feedback ${correct ? "good" : "miss"}"><strong>${correct ? "Správne." : "Nie celkom."}</strong>${c.e}</div>` : ""}</div>`;
+  } else {
+    const right = st.checks.filter((c, k) => ui.chk[k] != null && ui.chkOpts[k][ui.chk[k]].i === c.a).length;
+    S.done[st.id] = true; save();
+    const nx = STATIONS.find(s => s.id === st.id + 1);
+    body = `<div class="card"><span class="eyebrow">Zastávka hotová · ${right} z ${st.checks.length} správne</span>
+      <p class="remember">${st.remember}</p>
+      <p class="muted">Túto vetu si zopakuj zajtra. Pomôžu ti s tým kartičky.</p></div>`;
+    app.innerHTML = `${barHtml(steps.length)}${body}
+      <div class="navbar"><a class="btn ghost" href="#">Mapa</a>${nx ? `<a class="btn" href="#stanica-${nx.id}">Ďalej: ${nx.short} →</a>` : `<a class="btn" href="#kvapka">Cesta kvapky →</a>`}</div>`;
+    return;
+  }
+  app.innerHTML = `${barHtml(steps.length)}${body}
+    <div class="navbar">
+      ${ui.step === 0 ? `<a class="btn ghost" href="#">Mapa</a>` : `<button class="btn ghost" data-act="prev">Späť</button>`}
+      <button class="btn" data-act="next" ${canNext ? "" : "disabled"}>${canNext ? "Ďalej" : "Vyber odpoveď"}</button>
+    </div>
+    <p class="kbd">klávesy A B C · Enter = ďalej</p>`;
+}
+function barHtml(n) { return `<div class="bar" aria-hidden="true">${Array.from({ length: n }, (_, i) => `<i class="${i <= ui.step ? "on" : ""}"></i>`).join("")}</div>`; }
+
+/* ---------- Cesta kvapky ---------- */
+function dropView() {
+  if (ui.view !== "drop") ui = { view: "drop", org: "clovek" };
+  if (!ui.pool || ui.poolOrg !== ui.org) {
+    const r = ROUTES[ui.org];
+    ui.poolOrg = ui.org; ui.pos = 0; ui.err = 0; ui.hint = null;
+    ui.pool = shuffle([...r.steps.map((s, i) => ({ t: s[0], id: "s" + i })), ...r.decoys.map((t, i) => ({ t, id: "d" + i }))]);
+  }
+  const r = ROUTES[ui.org], done = ui.pos >= r.steps.length;
+  app.innerHTML = `
+  <div class="stack">
+    <span class="eyebrow">Hra · Cesta kvapky</span>
+    <h2>Preveď kvapku krvi celým obehom</h2>
+    <div class="tabs">${Object.entries(ROUTES).map(([k, v]) => `<button class="tab ${k === ui.org ? "on" : ""}" data-act="org" data-k="${k}">${v.name}</button>`).join("")}</div>
+    <div class="card">
+      <p class="muted">${r.start} Ťukaj na zastávky v správnom poradí. Farba bodky ukazuje, akú krv kvapka práve nesie.</p>
+      <ol class="path">
+        ${r.steps.map((s, i) => i < ui.pos
+          ? `<li><span class="n">${i + 1}</span><span class="d" style="background:var(--${s[1]})"></span><span>${s[0]}</span></li>`
+          : i === ui.pos ? `<li class="slot"><span class="n">${i + 1}</span><span class="d"></span><span>?</span></li>` : "").join("")}
+      </ol>
+      ${done ? `<div class="feedback good"><strong>Kvapka je späť na začiatku. Obeh je uzavretý.</strong>${ui.err ? `Chyby: ${ui.err}. Skús to ešte raz bez chyby.` : "Bez jedinej chyby."}</div>
+        <div class="row"><button class="btn" data-act="again">Ešte raz</button>${Object.keys(ROUTES).filter(k => k !== ui.org).map(k => `<button class="btn ghost" data-act="org" data-k="${k}">${ROUTES[k].name}</button>`).join("")}</div>`
+      : `${ui.hint ? `<div class="hint">${ui.hint}</div>` : ""}
+        <div class="pool">${ui.pool.filter(t => !t.used).map(t => `<button class="tile" data-act="tile" data-id="${t.id}">${t.t}</button>`).join("")}</div>`}
+    </div>
+    <p class="muted" style="font-size:.9rem">Medzi zastávkami sú aj dve, ktoré do tohto obehu nepatria.</p>
+  </div>`;
+}
+
+/* ---------- Kam patrí ---------- */
+function sortView() {
+  if (ui.view !== "sort") ui = { view: "sort", list: shuffle(ANIMALS).slice(0, 12), i: 0, right: 0, pick: null };
+  const total = ui.list.length;
+  if (ui.i >= total) {
+    app.innerHTML = `<div class="card"><span class="eyebrow">Kam patrí? · výsledok</span>
+      <div class="score">${ui.right}<span class="muted" style="font-size:.4em"> / ${total}</span></div>
+      <p class="muted">${ui.right === total ? "Bez chyby, aj s výnimkami." : "Pozri si zastávky, kde si sa pomýlil(a), a skús znova."}</p>
+      <div class="row"><button class="btn" data-act="sortagain">Nové kolo</button><a class="btn ghost" href="#">Mapa</a></div></div>`;
+    return;
+  }
+  const [name, cat, why] = ui.list[ui.i];
+  const ok = ui.pick === cat;
+  app.innerHTML = `<div class="stack">
+    <span class="eyebrow">Hra · Kam patrí? · ${ui.i + 1} / ${total}</span>
+    <div class="card">
+      <span class="muted">Aký typ obehovej sústavy alebo srdca má</span>
+      <div class="animal">${name}</div>
+      <div class="cats">${SORT_CATS.map((c, k) => {
+        let cls = ""; if (ui.pick != null) cls = k === cat ? "right" : (k === ui.pick ? "wrong" : "dim");
+        return `<button class="opt ${cls}" data-act="cat" data-k="${k}" ${ui.pick != null ? "disabled" : ""}><span class="k">${k + 1}</span><span>${c}</span></button>`; }).join("")}</div>
+      ${ui.pick != null ? `<div class="feedback ${ok ? "good" : "miss"}"><strong>${ok ? "Správne." : "Patrí do: " + SORT_CATS[cat]}</strong>${why}</div>` : ""}
+    </div>
+    <div class="navbar"><a class="btn ghost" href="#">Mapa</a><button class="btn" data-act="sortnext" ${ui.pick == null ? "disabled" : ""}>Ďalej</button></div>
+  </div>`;
+}
+
+/* ---------- Kartičky ---------- */
+function cardsView() {
+  if (ui.view !== "cards") {
+    const order = shuffle(CARDS.map((_, i) => i)).sort((a, b) => (S.boxes[a] || 0) - (S.boxes[b] || 0)).slice(0, 12);
+    ui = { view: "cards", queue: order, flipped: false, seen: 0 };
+  }
+  const counts = [0, 1, 2, 3].map(b => CARDS.filter((_, i) => Math.min(S.boxes[i] || 0, 3) === b).length);
+  const head = `<span class="eyebrow">Kartičky · opakovanie s rozostupmi</span>
+    <div><div class="boxes">${counts.map((c, b) => `<div class="${b === 3 ? "lit" : ""}" style="height:${4 + (c / CARDS.length) * 40}px" title="${c}"></div>`).join("")}</div>
+    <div class="boxlbl"><span>nové ${counts[0]}</span><span>1× ${counts[1]}</span><span>2× ${counts[2]}</span><span>vieš ${counts[3]}</span></div></div>`;
+  if (!ui.queue.length) {
+    app.innerHTML = `<div class="stack">${head}<div class="card"><h2>Kolo hotové</h2><p class="muted">Kartičky, ktoré si vedel(a), sa posunuli ďalej a ukážu sa zriedkavejšie. Najlepšie je vrátiť sa zajtra.</p>
+      <div class="row"><button class="btn" data-act="cardsagain">Ďalšie kolo</button><a class="btn ghost" href="#">Mapa</a></div></div></div>`;
+    return;
+  }
+  const i = ui.queue[0], [q, a] = CARDS[i];
+  app.innerHTML = `<div class="stack">${head}
+    <button class="card flash" data-act="flip" aria-label="Otočiť kartičku">
+      <span class="mono">${ui.flipped ? "odpoveď" : "otázka · ťukni pre odpoveď"}</span>
+      <span class="q">${q}</span>
+      ${ui.flipped ? `<span class="a">${a}</span>` : ""}
+    </button>
+    ${ui.flipped ? `<div class="row" style="justify-content:space-between"><button class="btn ghost" style="flex:1" data-act="no">Ešte neviem</button><button class="btn" style="flex:1" data-act="yes">Viem</button></div>`
+                 : `<p class="muted" style="text-align:center">Najprv si odpoveď povedz sám/sama, až potom otoč.</p>`}
+    <p class="kbd">medzerník = otočiť · ← neviem · → viem</p>
+  </div>`;
+}
+
+/* ---------- Skúška ---------- */
+function testBank() {
+  return [...STATIONS.flatMap(s => s.checks.map(c => ({ ...c, s: s.id }))), ...EXTRA_TEST];
+}
+function testView() {
+  if (ui.view !== "test") {
+    const qs = shuffle(testBank()).slice(0, 12).map(q => ({ ...q, opts: shuffle(q.o.map((t, i) => ({ t, i }))) }));
+    ui = { view: "test", qs, i: 0, ans: [] };
+  }
+  const total = ui.qs.length;
+  if (ui.i >= total) {
+    const right = ui.qs.filter((q, k) => q.opts[ui.ans[k]].i === q.a).length;
+    if (S.best == null || right > S.best) { S.best = right; save(); }
+    const missed = ui.qs.map((q, k) => ({ q, k })).filter(({ q, k }) => q.opts[ui.ans[k]].i !== q.a);
+    const toReview = [...new Set(missed.map(m => m.q.s))].sort((a, b) => a - b);
+    app.innerHTML = `<div class="stack">
+      <span class="eyebrow">Skúška · výsledok</span>
+      <div class="score">${right}<span class="muted" style="font-size:.4em"> / ${total}</span></div>
+      <p class="muted">${right >= 11 ? "Výborné. Toto učivo máš v hlave." : right >= 8 ? "Dobré. Zopakuj si zastávky nižšie a skús to znova." : "Ešte to chce opakovanie. Prejdi si zastávky nižšie."}</p>
+      ${toReview.length ? `<div class="row">${toReview.map(id => `<a class="btn ghost" href="#stanica-${id}">Zopakovať: ${STATIONS[id - 1].short}</a>`).join("")}</div>` : ""}
+      ${missed.length ? `<h3 style="margin-top:12px">Na tieto si daj pozor</h3><ul class="miss-list">${missed.map(({ q }) => `<li><b>${q.q}</b><br>Správne: ${q.o[q.a]}. <span class="muted">${q.e}</span></li>`).join("")}</ul>` : ""}
+      <div class="row"><button class="btn" data-act="testagain">Nová skúška</button><a class="btn ghost" href="#">Mapa</a></div>
+    </div>`;
+    return;
+  }
+  const q = ui.qs[ui.i], ch = ui.ans[ui.i];
+  const correct = ch != null && q.opts[ch].i === q.a;
+  app.innerHTML = `<div class="stack">
+    <div class="bar" aria-hidden="true">${ui.qs.map((_, k) => `<i class="${k <= ui.i ? "on" : ""}"></i>`).join("")}</div>
+    <div class="card"><span class="eyebrow">Skúška · ${ui.i + 1} / ${total} · ${STATIONS[q.s - 1].short}</span><h2>${q.q}</h2>
+      ${optsHtml(q.opts, ch, q.a, "test")}
+      ${ch != null ? `<div class="feedback ${correct ? "good" : "miss"}"><strong>${correct ? "Správne." : "Nie celkom."}</strong>${q.e}</div>` : ""}</div>
+    <div class="navbar"><a class="btn ghost" href="#">Mapa</a><button class="btn" data-act="testnext" ${ch == null ? "disabled" : ""}>${ui.i === total - 1 ? "Výsledok" : "Ďalej"}</button></div>
+    <p class="kbd">klávesy A B C · Enter = ďalej</p>
+  </div>`;
+}
+
+/* ---------- Ťahák ---------- */
+function sheetView() {
+  ui = { view: "sheet" };
+  const rows = [
+    ["Hubky, pŕhlivce, ploskavce", "žiadna", "–", "–", "–", "difúzia; gastrovaskulárna dutina"],
+    ["Článkonožce, mäkkýše", "otvorená", "chrbtová cieva s ostiami (hmyz)", "–", "hemolymfa", "hemocél; hemocyanín (Cu); hlavonožce majú uzavretú a 3 srdcia"],
+    ["Obrúčkavce", "uzavretá", "5 párov srdcových ciev", "–", "–", "chrbtom dopredu, bruchom dozadu; hemoglobín v plazme"],
+    ["Kopijovec", "uzavretá", "nemá, pulzuje brušná cieva", "–", "bezfarebná", "brušnou cievou dopredu, chrbtovou dozadu"],
+    ["Ryby", "uzavretá", "2 oddiely: predsieň, komora", "1", "odkysličená", "žilový splav, tepnový násadec; žilové srdce"],
+    ["Obojživelníky", "uzavretá", "3 oddiely: 2 predsiene, 1 komora", "2", "zmiešaná", "malý obeh do pľúc a kože"],
+    ["Plazy", "uzavretá", "3 oddiely + neúplná priehradka", "2", "mierne zmiešaná", "2 oblúky aorty; krokodíl 4 oddiely + Panizzov otvor"],
+    ["Vtáky", "uzavretá", "4 oddiely", "2", "oddelená", "pravý oblúk aorty; krvinky s jadrom"],
+    ["Cicavce", "uzavretá", "4 oddiely", "2", "oddelená", "ľavý oblúk aorty; krvinky bez jadra"]
+  ];
+  app.innerHTML = `<div class="stack">
+    <span class="eyebrow">Ťahák</span>
+    <h2>Celá cesta na jednej strane</h2>
+    <div class="mnemo">
+      <div><b>2</b><span>ryba<br>1 obeh</span></div>
+      <div><b>3</b><span>žaba<br>krv sa mieša</span></div>
+      <div><b>3½</b><span>plaz<br>neúplná priehradka</span></div>
+      <div><b>4</b><span>vták, cicavec<br>(a krokodíl)</span></div>
+    </div>
+    <p class="muted">Pomôcka „2 – 3 – 3½ – 4“: počet oddielov srdca stavovcov. Polovica znamená neúplnú priehradku.</p>
+    <div class="tablewrap"><table>
+      <thead><tr><th>Skupina</th><th>Sústava</th><th>Srdce</th><th>Obehy</th><th>Krv v srdci</th><th>Zapamätaj si</th></tr></thead>
+      <tbody>${rows.map(r => `<tr>${r.map(c => `<td>${c}</td>`).join("")}</tr>`).join("")}</tbody>
+    </table></div>
+    <div class="rule stack" style="gap:8px">
+      <h3>Tepna verzus žila</h3>
+      <p><b>Tepna</b> vedie krv <b>zo</b> srdca, <b>žila</b> <b>do</b> srdca. O kyslíku to nehovorí nič.</p>
+      <p class="muted">Pľúcnica je tepna s odkysličenou krvou, pľúcne žily vedú okysličenú krv.</p>
+    </div>
+    <div class="rule stack" style="gap:8px">
+      <h3>Dva obehy človeka</h3>
+      <p><b>Malý:</b> pravá komora → pľúcnica → pľúca → pľúcne žily → ľavá predsieň.</p>
+      <p><b>Veľký:</b> ľavá komora → aorta → telo → duté žily → pravá predsieň.</p>
+      <p class="muted">Obeh začína v komore a končí v predsieni.</p>
+    </div>
+    <div class="rule stack" style="gap:8px">
+      <h3>Smer krvi: kto má čo naopak</h3>
+      <p><b>Dážďovka:</b> chrbtom dopredu, bruchom dozadu.</p>
+      <p><b>Kopijovec a stavovce:</b> bruchom dopredu (tam je srdce), chrbtom dozadu (aorta).</p>
+    </div>
+    <a class="btn ghost" href="#">Späť na mapu</a>
+  </div>`;
+}
+
+/* =========================================================
+   ROUTER + UDALOSTI
+   ========================================================= */
+function render() {
+  const h = location.hash.slice(1);
+  const m = h.match(/^stanica-(\d+)$/);
+  if (m) stationView(+m[1]);
+  else if (h === "kvapka") dropView();
+  else if (h === "triedenie") sortView();
+  else if (h === "karticky") cardsView();
+  else if (h === "test") testView();
+  else if (h === "tahak") sheetView();
+  else { ui = { view: "home" }; homeView(); }
+}
+function rerender() { const y = window.scrollY; render(); window.scrollTo(0, y); }
+window.addEventListener("hashchange", () => { ui.view = null; render(); window.scrollTo(0, 0); });
+
+function act(a, el) {
+  const id = +(location.hash.match(/stanica-(\d+)/) || [])[1];
+  const st = STATIONS.find(s => s.id === id);
+  switch (a) {
+    case "pred": if (ui.pred == null) { ui.pred = +el.dataset.i; rerender(); } break;
+    case "chk": { const k = +stationSteps(st)[ui.step].slice(5); if (ui.chk[k] == null) { ui.chk[k] = +el.dataset.i; rerender(); } break; }
+    case "reveal": ui.shown = true; rerender(); break;
+    case "next": ui.step++; render(); window.scrollTo(0, 0); break;
+    case "prev": ui.step = Math.max(0, ui.step - 1); render(); window.scrollTo(0, 0); break;
+    case "org": ui.org = el.dataset.k; ui.pool = null; render(); break;
+    case "again": ui.pool = null; render(); break;
+    case "tile": {
+      const r = ROUTES[ui.org], t = ui.pool.find(x => x.id === el.dataset.id), exp = r.steps[ui.pos];
+      if (t.t === exp[0]) {
+        t.used = true; ui.pos++; ui.hint = null; rerender();
+      } else {
+        ui.err++; el.classList.remove("shake"); void el.offsetWidth; el.classList.add("shake");
+        const prev = ui.pos ? r.steps[ui.pos - 1][0] : null;
+        ui.hint = `<b>${t.t}</b> teraz nie. ${prev ? "Kvapka je v časti <b>" + prev + "</b>. " : ""}${exp[2]}`;
+        const hintEl = app.querySelector(".hint");
+        if (hintEl) hintEl.innerHTML = ui.hint; else setTimeout(rerender, 360);
+      }
+      break;
+    }
+    case "cat": if (ui.pick == null) { ui.pick = +el.dataset.k; if (ui.pick === ui.list[ui.i][1]) ui.right++; rerender(); } break;
+    case "sortnext": ui.i++; ui.pick = null; render(); break;
+    case "sortagain": ui.view = null; render(); break;
+    case "flip": ui.flipped = !ui.flipped; render(); break;
+    case "yes": case "no": {
+      const i = ui.queue.shift();
+      if (a === "yes") S.boxes[i] = (S.boxes[i] || 0) + 1;
+      else { S.boxes[i] = 0; ui.queue.splice(Math.min(3, ui.queue.length), 0, i); }
+      save(); ui.flipped = false; render(); break;
+    }
+    case "cardsagain": ui.view = null; render(); break;
+    case "test": if (ui.ans[ui.i] == null) { ui.ans[ui.i] = +el.dataset.i; rerender(); } break;
+    case "testnext": ui.i++; render(); window.scrollTo(0, 0); break;
+    case "testagain": ui.view = null; render(); break;
+  }
+}
+app.addEventListener("click", (e) => {
+  const el = e.target.closest("[data-act]");
+  if (el && !el.disabled) act(el.dataset.act, el);
+});
+document.addEventListener("keydown", (e) => {
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  const k = e.key.toLowerCase();
+  const idx = { a: 0, b: 1, c: 2, "1": 0, "2": 1, "3": 2, "4": 3, "5": 4, "6": 5 }[k];
+  if (idx != null) {
+    const opts = app.querySelectorAll(".opt:not([disabled])");
+    if (opts[idx]) { opts[idx].click(); e.preventDefault(); }
+    return;
+  }
+  if (k === "enter") {
+    const n = app.querySelector('[data-act="next"]:not([disabled]), [data-act="testnext"]:not([disabled]), [data-act="sortnext"]:not([disabled])');
+    const tag = document.activeElement?.tagName;
+    if (n && tag !== "A" && tag !== "BUTTON") { n.click(); e.preventDefault(); }
+  }
+  if (ui.view === "cards") {
+    if (k === " ") { act("flip"); e.preventDefault(); }
+    if (ui.flipped && k === "arrowright") act("yes");
+    if (ui.flipped && k === "arrowleft") act("no");
+  }
+});
+render();
+</script>
+</body>
+</html>
