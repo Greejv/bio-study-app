@@ -16,7 +16,7 @@ Otvor `index.html` v prehliadači (funguje aj offline, len bez vlastných fontov
 Zdroj je `src/app.html`; `./build.sh` z neho vygeneruje `index.html`.
 
 ## Dizajn
-Štvorčekový zošit z biológie (v tmavom režime školská tabuľa). Fonty: Anybody, Piazzolla, Shantell Sans.
+Minimalistický dizajn inšpirovaný Apple: biela plocha, zaoblené sivé skupiny ako v iOS, jeden font (Onest), modrá pre akcie, červená a modrá len pre krv.
 
 ## Zdroje k metódam učenia
 - Dunlosky a kol. (2013), Improving Students' Learning With Effective Learning Techniques.
